@@ -9,24 +9,39 @@ using namespace FP;
 
 int main(int arg,char* argv[])
 {
+    //this creates the run manager
     auto runmanager = G4RunManagerFactory::CreateRunManager();
+
+    //initialise the detector geometry
     runmanager->SetUserInitialization(new DetectorConstruction);
+
+    //initialise the physics list
     runmanager->SetUserInitialization(new PhysicsList);
+
+    //initialise user actions (primary generation,run,step,track,etc.)
     runmanager->SetUserInitialization(new ActionInitialization);
+
+    //set stuff up
     runmanager->Initialize();
+
+    //get ui
     G4UImanager* UImanager = G4UImanager::GetUIPointer();
+
     /*UImanager->ApplyCommand("/run/verbose 1");
     UImanager->ApplyCommand("/event/verbose 1");
     UImanager->ApplyCommand("/tracking/verbose 1");
-    int numOfEvent = 3;
+    int numOfEvent = 5;
     runmanager->BeamOn(numOfEvent);*/
+
     if(argc==1) {
+        //if no arguments passed, run init.mac and start interactive session
         G4UIExecutive* ui = new G4UIExecutive(argc,argv);
         UImanager->ApplyCommand("control/execute/ init.mac");
         ui->SessionStart();
         delete ui;
     }
     else {
+        //otherwise run passed macro
         G4String command = "control/execute ";
         G4String fileName = argv[1];
         UImanager->ApplyCommand(command+fileName);
