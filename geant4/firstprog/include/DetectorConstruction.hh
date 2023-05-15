@@ -12,7 +12,7 @@ namespace FP{
         DetectorConstruction() = default;
         ~DetectorConstruction() override = default;
         G4VPhysicalVolume* Construct() override;
-    }
+    };
 }
 
 #endif //FPDetectorConstruction_h

@@ -3,7 +3,7 @@
 #include "ActionInitialization.hh"
 
 #include "G4RunManagerFactory.hh"
-#include "G4UIManager.hh"
+#include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "QBBC.hh"
@@ -14,7 +14,7 @@ class G4VisManager;
 
 using namespace FP;
 
-int main(int arg,char* argv[])
+int main(int argc,char* argv[])
 {
     //this creates the run manager
     auto runmanager = G4RunManagerFactory::CreateRunManager();
@@ -33,29 +33,30 @@ int main(int arg,char* argv[])
 
     //set stuff up
     runmanager->Initialize();
+    
+    //set up vis manager
+    G4VisManager* visManager = new G4VisExecutive;
+    visManager->Initialize();
 
     //get ui
-    G4UImanager* UImanager = G4UImanager::GetUIPointer();
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
     /*UImanager->ApplyCommand("/run/verbose 1");
     UImanager->ApplyCommand("/event/verbose 1");
     UImanager->ApplyCommand("/tracking/verbose 1");
     int numOfEvent = 5;
     runmanager->BeamOn(numOfEvent);*/
-
-    G4VisManager* visManager = new G4VisExecutive;
-    visManager->Initialize();
-
+    G4cout << argc << G4endl;
     if(argc==1) {
         //if no arguments passed, run init.mac and start interactive session
         G4UIExecutive* ui = new G4UIExecutive(argc,argv);
-        //UImanager->ApplyCommand("control/execute/ init.mac");
+        UImanager->ApplyCommand("/control/execute init.mac");
         ui->SessionStart();
         delete ui;
     }
     else {
         //otherwise run passed macro
-        G4String command = "control/execute ";
+        G4String command = "/control/execute ";
         G4String fileName = argv[1];
         UImanager->ApplyCommand(command+fileName);
     }

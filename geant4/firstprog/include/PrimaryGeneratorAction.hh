@@ -10,13 +10,14 @@ class G4Event;
 namespace FP{
 	class PrimaryGeneratorAction: public G4VUserPrimaryGeneratorAction{
 		public:
-		PrimaryGeneratorAction() = default;
-		~PrimaryGeneratorAction() override = default;
+		PrimaryGeneratorAction();
+		~PrimaryGeneratorAction() override;
 		void GeneratePrimaries(G4Event*) override;
+		const G4ParticleGun* GetParticleGun() const {return fParticleGun;}
 
 		private:
-		G4ParticleGun* fParticleGun;
-	}
+		G4ParticleGun* fParticleGun = nullptr;
+	};
 }
 
 #endif //FPPrimaryGeneratorAction_h

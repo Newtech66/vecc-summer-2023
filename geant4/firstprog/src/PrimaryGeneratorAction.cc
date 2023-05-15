@@ -14,18 +14,18 @@ namespace FP{
 		//particle
 		G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 		G4String particleName;
-		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
+		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
 		fParticleGun->SetParticleDefinition(particle);
-		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-		fParticleGun->SetParticleEnergy(6.*MeV);
+		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
+		fParticleGun->SetParticleEnergy(1.*GeV);
 	}
 
 	PrimaryGeneratorAction::~PrimaryGeneratorAction(){
 		delete fParticleGun;
 	}	
 
-	PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
-		fParticleGun->SetParticlePosition(G4ThreeVector(-2.0*m,.0*m,.0*m));
+	void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
+		fParticleGun->SetParticlePosition(G4ThreeVector(-9.0*m,.0*m,.0*m));
 		fParticleGun->GeneratePrimaryVertex(anEvent);
 	}
 }

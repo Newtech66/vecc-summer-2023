@@ -1,0 +1,4 @@
+/vis/open OGL 1280x720
+/vis/drawVolume
+/vis/scene/add/trajectories smooth
+/run/beamOn 1
