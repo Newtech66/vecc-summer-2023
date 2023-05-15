@@ -15,4 +15,4 @@ namespace FP{
     }
 }
 
-#endif
+#endif //FPDetectorConstruction_h
