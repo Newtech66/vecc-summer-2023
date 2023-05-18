@@ -14,10 +14,10 @@ namespace FP{
 		//particle
 		G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 		G4String particleName;
-		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
+		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
 		fParticleGun->SetParticleDefinition(particle);
 		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
-		fParticleGun->SetParticleEnergy(1.*GeV);
+		fParticleGun->SetParticleEnergy(4.2*eV);
 	}
 
 	PrimaryGeneratorAction::~PrimaryGeneratorAction(){

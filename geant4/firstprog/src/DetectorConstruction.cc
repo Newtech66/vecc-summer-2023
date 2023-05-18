@@ -16,7 +16,7 @@ namespace FP{
         G4bool checkOverlaps = true;
 
         //World
-        G4Material* world_mat = nist->FindOrBuildMaterial("G4_WATER");
+        G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
         G4double world_x = 10.0*m;
         G4double world_y = 3.0*m;
         G4double world_z = 3.0*m;

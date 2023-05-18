@@ -46,7 +46,7 @@ int main(int argc,char* argv[])
     UImanager->ApplyCommand("/tracking/verbose 1");
     int numOfEvent = 5;
     runmanager->BeamOn(numOfEvent);*/
-    G4cout << argc << G4endl;
+    G4cout << *(G4Material::GetMaterialTable()) << G4endl;
     if(argc==1) {
         //if no arguments passed, run init.mac and start interactive session
         G4UIExecutive* ui = new G4UIExecutive(argc,argv);
