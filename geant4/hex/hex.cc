@@ -6,7 +6,7 @@
 #include "G4UImanager.hh"
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
-#include "QBBC.hh"
+#include "FTFP_BERT.hh"
 #include "globals.hh"
 
 class G4VModularPhysicsList;
@@ -24,7 +24,7 @@ int main(int argc,char* argv[])
 
     //initialise the physics list
     //runmanager->SetUserInitialization(new PhysicsList);
-    G4VModularPhysicsList* physicsList = new QBBC;
+    G4VModularPhysicsList* physicsList = new FTFP_BERT;
     physicsList->SetVerboseLevel(1);
     runmanager->SetUserInitialization(physicsList);
 

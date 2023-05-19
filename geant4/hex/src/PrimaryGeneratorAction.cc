@@ -14,10 +14,10 @@ namespace Hex{
 		//particle
 		G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 		G4String particleName;
-		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
+		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="e+");
 		fParticleGun->SetParticleDefinition(particle);
-		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
-		fParticleGun->SetParticleEnergy(4.2*eV);
+		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+		fParticleGun->SetParticleEnergy(1.*GeV);
 	}
 
 	PrimaryGeneratorAction::~PrimaryGeneratorAction(){
@@ -25,7 +25,7 @@ namespace Hex{
 	}	
 
 	void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
-		fParticleGun->SetParticlePosition(G4ThreeVector(-9.0*m,.0*m,.0*m));
+		fParticleGun->SetParticlePosition(G4ThreeVector(.0*cm,.0*cm,-5.0*cm));
 		fParticleGun->GeneratePrimaryVertex(anEvent);
 	}
 }
