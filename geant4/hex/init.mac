@@ -1,13 +1,14 @@
 /vis/open OGL 1280x720
 /vis/drawVolume
 /vis/scene/add/trajectories smooth
-/vis/modeling/trajectories/create/drawByCharge
-/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
-/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+/vis/modeling/trajectories/create/drawByParticleID
+/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 2
 #/vis/scene/add/axes 0.05 0.05 0 0.01
 /vis/geometry/set/colour hex 1 0.7216 0.451 0.2 1
-/vis/geometry/set/colour gas 1 0 0 0.5 0.5
+/vis/geometry/set/colour DetectorLV 1 0 0 0.5 0.5
 /vis/scene/add/hits
 /vis/geometry/set/visibility World 0 false
+/vis/geometry/set/visibility Tracker 0 false
 /vis/viewer/set/style surface
 /run/beamOn 1
