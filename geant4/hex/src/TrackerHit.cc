@@ -46,6 +46,8 @@ void TrackerHit::Print()
      << std::setw(7) << G4BestUnit(fEdep,"Energy")
      << " Position: "
      << std::setw(7) << G4BestUnit( fPos,"Length")
+     <<" Local time: "
+     << std::setw(7) << G4BestUnit(fTime,"Time")
      << G4endl;
 }
 

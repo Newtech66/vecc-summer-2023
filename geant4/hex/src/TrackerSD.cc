@@ -50,6 +50,7 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
                                                ->GetCopyNumber());
   newHit->SetEdep(edep);
   newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
+  newHit->SetTime(aStep->GetTrack()->GetLocalTime());
 
   fHitsCollection->insert( newHit );
 

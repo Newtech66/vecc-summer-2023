@@ -39,6 +39,7 @@ class TrackerHit : public G4VHit
     void SetChamberNb(G4int chamb)      { fChamberNb = chamb; };
     void SetEdep     (G4double de)      { fEdep = de; };
     void SetPos      (G4ThreeVector xyz){ fPos = xyz; };
+    void SetTime     (G4double time)    { fTime = time; };
 
     // Get methods
     G4int GetTrackID() const     { return fTrackID; };
@@ -51,6 +52,8 @@ class TrackerHit : public G4VHit
     G4int         fChamberNb = -1;
     G4double      fEdep = 0.;
     G4ThreeVector fPos;
+    G4double      fTime;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

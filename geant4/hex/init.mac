@@ -4,7 +4,6 @@
 /vis/modeling/trajectories/create/drawByParticleID
 /vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts true
 /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 2
-#/vis/scene/add/axes 0.05 0.05 0 0.01
 /vis/geometry/set/colour hex 1 0.7216 0.451 0.2 1
 /vis/geometry/set/colour DetectorLV 1 0 0 0.5 0.5
 /vis/scene/add/hits

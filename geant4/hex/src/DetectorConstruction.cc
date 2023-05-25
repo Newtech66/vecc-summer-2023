@@ -1,4 +1,7 @@
 #include "DetectorConstruction.hh"
+#include "TrackerSD.hh"
+
+#include "G4SDManager.hh"
 #include "G4NistManager.hh"
 #include "G4Material.hh"
 #include "G4VPhysicalVolume.hh"
@@ -113,6 +116,7 @@ namespace Hex{
 				assemblyHex->MakeImprint(logTracker,tr_hexarr);
 				hex_count++;
 				hexarr_center += t_hexarr;
+				G4cout <<"SEE THIS " << t_hexarr << G4endl;
 			}
 		}
 		hexarr_center /= hex_count;
@@ -198,6 +202,13 @@ namespace Hex{
 	}
 
 	void DetectorConstruction::ConstructSDandField(){
+	  // Sensitive detectors
 
+	  G4String trackerChamberSDname = "/TrackerChamberSD";
+	  auto aTrackerSD = new TrackerSD(trackerChamberSDname, "TrackerHitsCollection");
+	  G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
+	  // Setting aTrackerSD to all logical volumes with the same name
+	  // of "Chamber_LV".
+	  SetSensitiveDetector("DetectorLV", aTrackerSD, true);
 	}
 }
