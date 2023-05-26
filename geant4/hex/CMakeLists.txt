@@ -19,6 +19,8 @@ target_link_libraries(hex ${Geant4_LIBRARIES})
 
 set(HEX_SCRIPTS
 init.mac
+run.mac
+plotHisto.C
 )
 
 foreach(_script ${HEX_SCRIPTS})

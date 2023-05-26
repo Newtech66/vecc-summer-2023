@@ -14,11 +14,15 @@ namespace Hex{
 		~DetectorConstruction() override;
 		G4VPhysicalVolume* Construct() override;
 		G4ThreeVector GetHexAssemblyCenter() const { return hexarr_center; }
+		G4int GetHexRows() const { return hex_rows; }
+		G4int GetHexCols() const { return hex_cols; }
 		void ConstructSDandField() override;
 
 	private:
 		G4ThreeVector hexarr_center;
-		G4int hex_count;
+		G4int hex_rows = 3;
+		G4int hex_cols = 3;
+		G4int hex_count = 0;
 		std::vector<G4LogicalVolume*>* fLogHex = nullptr;
 		G4UserLimits* fStepLimit = nullptr;
 		G4bool fCheckOverlaps = true;

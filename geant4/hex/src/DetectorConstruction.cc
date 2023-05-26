@@ -50,7 +50,6 @@ namespace Hex{
 											fCheckOverlaps);
 		//hexagon
 		auto hex_mat = man->FindOrBuildMaterial("G4_Cu");
-		int hex_rows = 3, hex_cols = 3;
 		G4double hex_depth = 8.0*mm;
 		G4double hex_rin = 5.0*mm;
 		G4double hex_thickness = 0.2*mm;
@@ -78,7 +77,7 @@ namespace Hex{
 											0,
 											true);*/
 		//tracker region
-		auto tracker_mat = man->FindOrBuildMaterial("G4_AIR");
+		/*auto tracker_mat = man->FindOrBuildMaterial("G4_AIR");
 		auto solidTracker = new G4Box("Tracker",
 									5*hex_rout*tan(30*deg)*(3*hex_rows+1),
 									5*hex_rout*(hex_cols+1),
@@ -95,7 +94,7 @@ namespace Hex{
 											logWorld,
 											false,
 											0,
-											fCheckOverlaps);
+											fCheckOverlaps);*/
 
 		//hexagon assembly
 		auto assemblyHex = new G4AssemblyVolume();
@@ -113,13 +112,14 @@ namespace Hex{
 				t_hexarr.setX(shift+col*hex_rout*2);
 				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
 				G4Transform3D tr_hexarr(r_hex,t_hexarr);
-				assemblyHex->MakeImprint(logTracker,tr_hexarr);
+				assemblyHex->MakeImprint(logWorld,tr_hexarr);
 				hex_count++;
 				hexarr_center += t_hexarr;
-				G4cout <<"SEE THIS " << t_hexarr << G4endl;
+				//G4cout <<"SEE THIS " << t_hexarr << G4endl;
 			}
 		}
 		hexarr_center /= hex_count;
+		//G4cout <<"SEE THIS CENTER " << hexarr_center << G4endl;
 
 		//Ar-CO2 mixture
 		auto Ar = man->FindOrBuildMaterial("G4_Ar");
@@ -191,7 +191,7 @@ namespace Hex{
 				new G4PVPlacement(tr_gasarr,
 								fLogHex->back(),
 								"DetectorPV",
-								logTracker,
+								logWorld,
 								false,
 								(G4int)fLogHex->size()-1,
 								fCheckOverlaps);
