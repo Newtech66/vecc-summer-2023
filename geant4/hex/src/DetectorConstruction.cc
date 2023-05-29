@@ -24,7 +24,8 @@ namespace Hex{
 
 	DetectorConstruction::~DetectorConstruction(){
 		delete fLogHex;
-		delete fStepLimit;
+		delete fGasStepLimit;
+		delete fConvStepLimit;
 	}
 
 	G4VPhysicalVolume* DetectorConstruction::Construct(){
@@ -83,8 +84,8 @@ namespace Hex{
 		gas_mat->AddMaterial(CO2,30*perCent);
 
 		//set step limits
-		G4double maxStep = 0.1*hex_depth;
-		fStepLimit = new G4UserLimits(maxStep);
+		G4double gasMaxStep = 0.1*hex_depth;
+		fGasStepLimit = new G4UserLimits(gasMaxStep);
 
 		//gas detectors
 		G4double gas_depth = 8.0*mm;
@@ -112,7 +113,7 @@ namespace Hex{
 				G4Transform3D tr_gasarr(r_gas,t_gasarr);
 				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",
 														nullptr,nullptr,nullptr));
-				fLogHex->back()->SetUserLimits(fStepLimit);
+				fLogHex->back()->SetUserLimits(fGasStepLimit);
 				new G4PVPlacement(tr_gasarr,fLogHex->back(),"DetectorPV",logWorld,
 									false,(G4int)fLogHex->size()-1,fCheckOverlaps);
 			}
@@ -124,6 +125,12 @@ namespace Hex{
 		G4double air_gap = 1*cm;
 		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
 		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");
+
+		//set step limits
+		G4double convMaxStep = 0.1*conv_depth;
+		fConvStepLimit = new G4UserLimits(convMaxStep);
+		logConv->SetUserLimits(fConvStepLimit);
+
 		G4ThreeVector t_conv;
 		t_conv.setZ(-conv_depth/2.-air_gap);
 		t_conv += hexarr_center;

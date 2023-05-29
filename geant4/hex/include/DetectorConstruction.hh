@@ -24,7 +24,8 @@ namespace Hex{
 		G4int hex_cols = 10;
 		G4int hex_count = 0;
 		std::vector<G4LogicalVolume*>* fLogHex = nullptr;
-		G4UserLimits* fStepLimit = nullptr;
+		G4UserLimits* fGasStepLimit = nullptr;
+		G4UserLimits* fConvStepLimit = nullptr;
 		G4bool fCheckOverlaps = true;
 	};
 }
