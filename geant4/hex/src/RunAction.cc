@@ -18,15 +18,14 @@ namespace Hex{
 		analysisManager->CreateNtupleDColumn("Edep_keV");
 		analysisManager->FinishNtuple();
 
-		event_histo_id = analysisManager->CreateH1("Events vs Edep","Number of events as a function of Edep",
+		event_hist_id = analysisManager->CreateH1("Events vs Edep","Number of events as a function of Edep",
 													1000,0.,10.*keV,"keV");
-		//G4cout<<"SEE THIS HISTO STUFF "<<det_obj->GetHexCols()<<" "<<det_obj->GetHexRows()<<G4endl;
-		cell_histo_id = analysisManager->CreateH2("Cell plot of Edep","Counts",
+		cell_hist_id = analysisManager->CreateH2("Cell plot of counts","Counts per cell",
 													2*(det_obj->GetHexCols())+1,0,2*(det_obj->GetHexCols())+1,
 													det_obj->GetHexRows(),0,det_obj->GetHexRows());
-		// cell_histo_id = analysisManager->CreateH2("Cell plot of Edep","Counts",
-		// 											100,0,10,
-		// 											100,0,10);
+		cell_edep_hist_id = analysisManager->CreateH2("Cell plot of Edep","Energy deposited per cell",
+													2*(det_obj->GetHexCols())+1,0,2*(det_obj->GetHexCols())+1,
+													det_obj->GetHexRows(),0,det_obj->GetHexRows());
 	}
 
 	void RunAction::BeginOfRunAction(const G4Run* aRun){

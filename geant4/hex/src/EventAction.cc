@@ -16,9 +16,10 @@ namespace Hex{
 	void EventAction::EndOfEventAction(const G4Event* anEvent){
 		auto run = static_cast<const RunAction*>(G4RunManager::GetRunManager()->GetUserRunAction());
 		G4int tupleid = run->GetNtupleId();
-		G4int eventhistoid = run->GetEventHistoId();
-		G4int cellhistoid = run->GetCellHistoId();
-		//G4cout<<"SEE THIS CELLHISTOID "<<cellhistoid<<G4endl;
+		G4int eventhistid = run->GetEventHistId();
+		G4int cellhistid = run->GetCellHistId();
+		G4int celledephistid = run->GetCellEdepHistId();
+
 		auto analysisManager = G4AnalysisManager::Instance();
 		auto HC = anEvent->GetHCofThisEvent()->GetHC(0);
 		auto det_obj = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
@@ -40,19 +41,14 @@ namespace Hex{
 			totalEdep[hit->GetChamberNb()] += hit->GetEdep();
 			EdepOfEvent += hit->GetEdep();
 		}
-		if(EdepOfEvent>0.)	analysisManager->FillH1(eventhistoid,EdepOfEvent);
-		//G4cout << "In this event:" << G4endl;
-		//if(nofHits == 0)	G4cout<< "There were no hits." << G4endl;
-		//G4cout << tupleid <<" "<<eventhistoid<<G4endl;
+		if(EdepOfEvent>0.)	analysisManager->FillH1(eventhistid,EdepOfEvent);
 		for(auto [hexNo,Edep]:totalEdep){
 			analysisManager->FillNtupleIColumn(tupleid,0,anEvent->GetEventID());
 			analysisManager->FillNtupleIColumn(tupleid,1,hexNo);
 			analysisManager->FillNtupleDColumn(tupleid,2,Edep/keV);
 			analysisManager->AddNtupleRow();
-			//analysisManager->FillH2(cellhistoid,0,0);
-			//G4cout<<"SEE THIS HEX "<<hexNo<<" "<<inv_hex_map(hexNo).first<<" "<<inv_hex_map(hexNo).second<<G4endl;
-			analysisManager->FillH2(cellhistoid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first);
-			//G4cout << "Hex number " << hexNo << " registered " << G4BestUnit(Edep,"Energy") << G4endl;
+			analysisManager->FillH2(cellhistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first);
+			analysisManager->FillH2(celledephistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first,Edep);
 		}
 	}
 }

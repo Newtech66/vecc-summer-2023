@@ -8,6 +8,5 @@
 /vis/geometry/set/colour DetectorLV 1 0 0 0.5 0.5
 /vis/scene/add/hits
 /vis/geometry/set/visibility World 0 false
-/vis/geometry/set/visibility Tracker 0 false
-/vis/viewer/set/style surface
+#/vis/viewer/set/style surface
 /run/beamOn 1

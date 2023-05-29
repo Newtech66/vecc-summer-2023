@@ -33,21 +33,10 @@ namespace Hex{
 		//world
 		auto world_mat = man->FindOrBuildMaterial("G4_AIR");
 		G4double world_x = 1*m, world_y = 1*m, world_z = 1*m;
-		auto solidWorld = new G4Box("World",
-									world_x,
-									world_y,
-									world_z);
-		auto logWorld = new G4LogicalVolume(solidWorld,
-											world_mat,
-											"World");
-		auto physWorld = new G4PVPlacement(nullptr,
-											G4ThreeVector(),
-											logWorld,
-											"World",
-											nullptr,
-											false,
-											0,
-											fCheckOverlaps);
+		auto solidWorld = new G4Box("World",world_x,world_y,world_z);
+		auto logWorld = new G4LogicalVolume(solidWorld,world_mat,"World");
+		auto physWorld = new G4PVPlacement(nullptr,G4ThreeVector(),logWorld,"World",
+											nullptr,false,0,fCheckOverlaps);
 		//hexagon
 		auto hex_mat = man->FindOrBuildMaterial("G4_Cu");
 		G4double hex_depth = 8.0*mm;
@@ -57,44 +46,9 @@ namespace Hex{
 		G4double hex_zplanes[] = {0.0*mm,hex_depth};
 		G4double hex_rinner[] = {hex_rin,hex_rin};
 		G4double hex_router[] = {hex_rout,hex_rout};
-		auto solidHex = new G4Polyhedra("hex",
-										.0,
-										CLHEP::twopi,
-										6,
-										2,
-										hex_zplanes,
-										hex_rinner,
-										hex_router);
-		auto logHex = new G4LogicalVolume(solidHex,
-											hex_mat,
-											"hex");
-		/*auto physHex = new G4PVPlacement(nullptr,
-											G4ThreeVector(),
-											logHex,
-											"hex",
-											logWorld,
-											false,
-											0,
-											true);*/
-		//tracker region
-		/*auto tracker_mat = man->FindOrBuildMaterial("G4_AIR");
-		auto solidTracker = new G4Box("Tracker",
-									5*hex_rout*tan(30*deg)*(3*hex_rows+1),
-									5*hex_rout*(hex_cols+1),
-									5*hex_depth);
-		auto logTracker = new G4LogicalVolume(solidTracker,
-											tracker_mat,
-											"Tracker");
-
-		//physical tracker placement
-		auto physTracker = new G4PVPlacement(nullptr,
-											G4ThreeVector(),
-											logTracker,
-											"Tracker",
-											logWorld,
-											false,
-											0,
-											fCheckOverlaps);*/
+		auto solidHex = new G4Polyhedra("hex",.0,CLHEP::twopi,6,2,
+										hex_zplanes,hex_rinner,hex_router);
+		auto logHex = new G4LogicalVolume(solidHex,hex_mat,"hex");
 
 		//hexagon assembly
 		auto assemblyHex = new G4AssemblyVolume();
@@ -115,11 +69,9 @@ namespace Hex{
 				assemblyHex->MakeImprint(logWorld,tr_hexarr);
 				hex_count++;
 				hexarr_center += t_hexarr;
-				//G4cout <<"SEE THIS " << t_hexarr << G4endl;
 			}
 		}
 		hexarr_center /= hex_count;
-		//G4cout <<"SEE THIS CENTER " << hexarr_center << G4endl;
 
 		//Ar-CO2 mixture
 		auto Ar = man->FindOrBuildMaterial("G4_Ar");
@@ -129,49 +81,21 @@ namespace Hex{
 		auto gas_mat = new G4Material("AR_CO2",gas_density,2);
 		gas_mat->AddMaterial(Ar,70*perCent);
 		gas_mat->AddMaterial(CO2,30*perCent);
+
+		//set step limits
+		G4double maxStep = 0.1*hex_depth;
+		fStepLimit = new G4UserLimits(maxStep);
+
+		//gas detectors
 		G4double gas_depth = 8.0*mm;
 		G4double gas_rin = 0.0*mm;
 		G4double gas_thickness = 5.0*mm;
 		G4double gas_zplanes[] = {0.0*mm,gas_depth};
 		G4double gas_rinner[] = {gas_rin,gas_rin};
 		G4double gas_router[] = {gas_rin+gas_thickness,gas_rin+gas_thickness};
-		auto solidGas = new G4Polyhedra("gas",
-										.0,
-										CLHEP::twopi,
-										6,
-										2,
-										gas_zplanes,
-										gas_rinner,
-										gas_router);
-		auto logGas = new G4LogicalVolume(solidGas,
-											hex_mat,
-											"gas");
-		
-		//gas assembly
-		/*auto assemblyGas = new G4AssemblyVolume();
-		G4ThreeVector t_gas;
-		G4RotationMatrix r_gas;
-		r_gas.rotateZ(15*deg);
-		G4Transform3D tr_gas;
-		tr_gas = G4Transform3D(r_gas,t_gas);
-		assemblyGas->AddPlacedVolume(logGas,tr_gas);
-		for(int row = 0;row < hex_rows;row++){
-			G4double gas_R = (hex_thickness+gas_thickness);
-			G4ThreeVector t_gasarr;
-			G4double shift = 0.*mm;
-			if(row % 2 == 1)	shift = -gas_R;
-			for(int col = 0;col < hex_cols+(row%2);col++){
-				t_gasarr.setX(shift+col*gas_R*2);
-				t_gasarr.setY(row*tan(twopi/6.0)*gas_R);
-				G4Transform3D tr_gasarr(r_gas,t_gasarr);
-				assemblyGas->MakeImprint(logWorld,tr_gasarr);
-				
-			}
-		}*/
-
-		//set step limits
-		G4double maxStep = 0.1*hex_depth;
-		fStepLimit = new G4UserLimits(maxStep);
+		auto solidGas = new G4Polyhedra("Gas",.0,CLHEP::twopi,6,2,
+										gas_zplanes,gas_rinner,gas_router);
+		auto logGas = new G4LogicalVolume(solidGas,hex_mat,"Gas");
 
 		G4ThreeVector t_gas;
 		G4RotationMatrix r_gas;
@@ -186,17 +110,25 @@ namespace Hex{
 				t_gasarr.setX(shift+col*gas_R*2);
 				t_gasarr.setY(row*tan(twopi/6.0)*gas_R);
 				G4Transform3D tr_gasarr(r_gas,t_gasarr);
-				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",nullptr,nullptr,nullptr));
+				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",
+														nullptr,nullptr,nullptr));
 				fLogHex->back()->SetUserLimits(fStepLimit);
-				new G4PVPlacement(tr_gasarr,
-								fLogHex->back(),
-								"DetectorPV",
-								logWorld,
-								false,
-								(G4int)fLogHex->size()-1,
-								fCheckOverlaps);
+				new G4PVPlacement(tr_gasarr,fLogHex->back(),"DetectorPV",logWorld,
+									false,(G4int)fLogHex->size()-1,fCheckOverlaps);
 			}
 		}
+
+		//lead converter
+		auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
+		G4double conv_depth = 3*(0.5*cm);	//3*X0
+		G4double air_gap = 1*cm;
+		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
+		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");
+		G4ThreeVector t_conv;
+		t_conv.setZ(-conv_depth/2.-air_gap);
+		t_conv += hexarr_center;
+		auto physConv = new G4PVPlacement(nullptr,t_conv,logConv,"Converter",
+											logWorld,false,0,fCheckOverlaps);
 
 		return physWorld;
 	}

@@ -17,7 +17,7 @@ namespace Hex{
 		//particle
 		G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 		G4String particleName;
-		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="pi+");
+		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
 		fParticleGun->SetParticleDefinition(particle);
 		fParticleGun->SetParticleEnergy(1.*GeV);
 	}
@@ -29,8 +29,8 @@ namespace Hex{
 	void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 		auto det_obj = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 		fParticleGun->SetParticlePosition(det_obj->GetHexAssemblyCenter() + G4ThreeVector(.0*cm,.0*cm,-10.*cm));
-		G4double rand_x = (G4UniformRand()-0.5)/2,rand_y = (G4UniformRand()-0.5)/5;
-		//G4double rand_x = 0.,rand_y = 0.;
+		//G4double rand_x = (G4UniformRand()-0.5)/2,rand_y = (G4UniformRand()-0.5)/5;
+		G4double rand_x = 0.,rand_y = 0.;
 		fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.)+G4ThreeVector(rand_x,rand_y,0.));
 		fParticleGun->GeneratePrimaryVertex(anEvent);
 	}
