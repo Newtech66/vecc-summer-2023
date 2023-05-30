@@ -49,6 +49,7 @@ namespace Hex{
 			analysisManager->AddNtupleRow();
 			analysisManager->FillH2(cellhistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first);
 			analysisManager->FillH2(celledephistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first,Edep);
+			analysisManager->FillH1(run->GetRCEdepHistId(hexNo),Edep);
 		}
 	}
 }

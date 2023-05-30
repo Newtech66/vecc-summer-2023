@@ -17,12 +17,14 @@ namespace Hex{
 		G4int GetEventHistId() const { return event_hist_id; }
 		G4int GetCellHistId() const { return cell_hist_id; }
 		G4int GetCellEdepHistId() const { return cell_edep_hist_id; }
+		G4int GetRCEdepHistId(const int hexNo) const { return rc_edep->at(hexNo); }
 
 	private:
 		G4int ntuple_id = -1;
 		G4int event_hist_id = -1;
 		G4int cell_hist_id = -1;
 		G4int cell_edep_hist_id = -1;
+		std::map<int,G4int>* rc_edep = nullptr;
 	};
 }
 

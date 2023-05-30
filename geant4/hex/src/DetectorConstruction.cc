@@ -120,9 +120,9 @@ namespace Hex{
 		}
 
 		//lead converter
-		auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
+		/*auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
 		G4double conv_depth = 3*(0.5*cm);	//3*X0
-		G4double air_gap = 1*cm;
+		G4double air_gap = 3*mm;
 		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
 		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");
 
@@ -135,7 +135,10 @@ namespace Hex{
 		t_conv.setZ(-conv_depth/2.-air_gap);
 		t_conv += hexarr_center;
 		auto physConv = new G4PVPlacement(nullptr,t_conv,logConv,"Converter",
-											logWorld,false,0,fCheckOverlaps);
+											logWorld,false,0,fCheckOverlaps);*/
+
+		//FR4 plates
+		
 
 		return physWorld;
 	}

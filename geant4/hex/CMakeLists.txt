@@ -22,6 +22,7 @@ init.mac
 run.mac
 plotHisto.C
 plotCell.C
+plotPerCellEdep.C
 )
 
 foreach(_script ${HEX_SCRIPTS})

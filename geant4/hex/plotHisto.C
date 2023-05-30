@@ -7,6 +7,6 @@
 	hist->Draw("HIST");
 	c1->cd(2);
 	//c1->cd(1);
-	TH2D* hist2 = (TH2D*)f->Get("Cell plot of Edep");
+	TH2D* hist2 = (TH2D*)f->Get("Cell plot of cumulative Edep");
 	hist2->Draw("HIST");
 }
