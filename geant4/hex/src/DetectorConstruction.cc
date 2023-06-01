@@ -120,7 +120,7 @@ namespace Hex{
 		}
 
 		//lead converter
-		/*auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
+		auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
 		G4double conv_depth = 3*(0.5*cm);	//3*X0
 		G4double air_gap = 3*mm;
 		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
@@ -135,10 +135,55 @@ namespace Hex{
 		t_conv.setZ(-conv_depth/2.-air_gap);
 		t_conv += hexarr_center;
 		auto physConv = new G4PVPlacement(nullptr,t_conv,logConv,"Converter",
-											logWorld,false,0,fCheckOverlaps);*/
+											logWorld,false,0,fCheckOverlaps);
 
 		//FR4 plates
-		
+
+		G4double density,fractionmass,a,z;
+		G4int ncomponents,natoms;
+		G4String name,symbol;
+		a = 1.01*g/mole;
+		G4Element* H  = new G4Element(name="Hydrogen",symbol="H" , z= 1., a);
+
+		a = 12.01*g/mole;
+		G4Element* C  = new G4Element(name="Carbon"  ,symbol="C" , z= 6., a);
+		auto SiO2 = man->FindOrBuildMaterial("G4_SILICON_DIOXIDE");
+		//
+		// materials for rad-source setup
+		//
+		//from http://www.physi.uni-heidelberg.de/~adler/TRD/TRDunterlagen/RadiatonLength/tgc2.htm
+		//Epoxy (for FR4 )
+		density = 1.2*g/cm3;
+		G4Material* Epoxy = new G4Material("Epoxy" , density, ncomponents=2);
+		Epoxy->AddElement(H, natoms=2);
+		Epoxy->AddElement(C, natoms=2);
+		  
+		//FR4 (Glass + Epoxy)
+		density = 1.86*g/cm3;
+		G4Material* FR4 = new G4Material("FR4"  , density, ncomponents=2);
+		FR4->AddMaterial(SiO2, fractionmass=0.528);
+		FR4->AddMaterial(Epoxy, fractionmass=0.472);
+
+		auto plate_mat = FR4;
+		G4double plate_depth = 3*mm;
+		auto solidPlate = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,plate_depth/2.);
+		auto logPlate = new G4LogicalVolume(solidPlate,plate_mat,"Plate");
+
+		//set step limits
+		G4double plateMaxStep = 0.5*plate_depth;
+		fPlateStepLimit = new G4UserLimits(plateMaxStep);
+		logPlate->SetUserLimits(fPlateStepLimit);
+
+		G4ThreeVector t_plate;
+		t_plate.setZ(-plate_depth/2.);
+		t_plate += hexarr_center;
+		auto physPlateFront = new G4PVPlacement(nullptr,t_plate,logPlate,"Plate",
+												logWorld,false,0,fCheckOverlaps);
+		t_plate -= hexarr_center;
+		t_plate.setZ(hex_depth+plate_depth/2.);
+		t_plate += hexarr_center;
+		auto physPlateBack = new G4PVPlacement(nullptr,t_plate,logPlate,"Plate",
+												logWorld,false,0,fCheckOverlaps);
 
 		return physWorld;
 	}

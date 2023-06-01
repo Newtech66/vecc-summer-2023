@@ -6,6 +6,7 @@
 /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 2
 /vis/geometry/set/colour hex 1 0.7216 0.451 0.2 1
 /vis/geometry/set/colour DetectorLV 1 0 0 0.5 0.5
+/vis/geometry/set/colour Plate 1 0 1 0 1
 /vis/scene/add/hits
 /vis/geometry/set/visibility World 0 false
 #/vis/viewer/set/style surface

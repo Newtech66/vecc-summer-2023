@@ -26,6 +26,7 @@ namespace Hex{
 		std::vector<G4LogicalVolume*>* fLogHex = nullptr;
 		G4UserLimits* fGasStepLimit = nullptr;
 		G4UserLimits* fConvStepLimit = nullptr;
+		G4UserLimits* fPlateStepLimit = nullptr;
 		G4bool fCheckOverlaps = true;
 	};
 }

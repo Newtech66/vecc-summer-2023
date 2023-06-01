@@ -1,12 +1,10 @@
 {
-	auto f = new TFile("hex.root");
-	auto c1 = new TCanvas("c1","",1920,640);
-	c1->Divide(2,1);
-	c1->cd(1);
-	TH1D* hist = (TH1D*)f->Get("Events vs Edep");
-	hist->Draw("HIST");
-	c1->cd(2);
-	//c1->cd(1);
-	TH2D* hist2 = (TH2D*)f->Get("Cell plot of cumulative Edep");
-	hist2->Draw("HIST");
+	auto f_H = new TFile("hex.root");
+	auto c_H = new TCanvas("c_H","",1920,1080);
+	c_H->cd(1);
+	TH1D* hist = (TH1D*)f_H->Get("Events vs Edep");
+	hist->Draw();
+	auto result_H = hist->Fit("landau","S Q");
+	cout<< "MPV" << " is " << *(result_H->GetParams()+1) << " keV" << endl;
+	gStyle->SetOptFit();
 }
