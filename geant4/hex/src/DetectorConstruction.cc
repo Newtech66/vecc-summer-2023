@@ -127,7 +127,7 @@ namespace Hex{
 		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");
 
 		//set step limits
-		G4double convMaxStep = 0.1*conv_depth;
+		G4double convMaxStep = 0.2*conv_depth;
 		fConvStepLimit = new G4UserLimits(convMaxStep);
 		logConv->SetUserLimits(fConvStepLimit);
 
