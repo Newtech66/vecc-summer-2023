@@ -35,10 +35,6 @@ int main(int argc,char* argv[])
 
     //set stuff up
     runmanager->Initialize();
-    
-    //set up vis manager
-    G4VisManager* visManager = new G4VisExecutive;
-    visManager->Initialize();
 
     //get ui
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
@@ -49,11 +45,15 @@ int main(int argc,char* argv[])
     int numOfEvent = 5;
     runmanager->BeamOn(numOfEvent);*/
     if(argc==1) {
+        //set up vis manager
+        G4VisManager* visManager = new G4VisExecutive;
+        visManager->Initialize();
         //if no arguments passed, run init.mac and start interactive session
         G4UIExecutive* ui = new G4UIExecutive(argc,argv);
         UImanager->ApplyCommand("/control/execute init.mac");
         ui->SessionStart();
         delete ui;
+        delete visManager;
     }
     else {
         //otherwise run passed macro
@@ -61,7 +61,6 @@ int main(int argc,char* argv[])
         G4String fileName = argv[1];
         UImanager->ApplyCommand(command+fileName);
     }
-    delete visManager;
     delete runmanager;
     return 0;
 }

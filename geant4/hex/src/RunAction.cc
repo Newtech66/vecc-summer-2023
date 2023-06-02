@@ -12,40 +12,11 @@ namespace Hex{
 		auto analysisManager = G4AnalysisManager::Instance();
 
 		analysisManager->SetNtupleMerging(true);
-		ntuple_id = analysisManager->CreateNtuple("hex","Edep per cell");
-		analysisManager->CreateNtupleIColumn("Event#");
-		analysisManager->CreateNtupleIColumn("Cell#");
-		analysisManager->CreateNtupleDColumn("Edep_keV");
+		ntuple_id = analysisManager->CreateNtuple("Hits","");
+		analysisManager->CreateNtupleIColumn("Event");
+		analysisManager->CreateNtupleIColumn("Cell");
+		analysisManager->CreateNtupleDColumn("Edep");
 		analysisManager->FinishNtuple();
-
-		// event_hist_id = analysisManager->CreateH1("Events vs Edep","Number of events as a function of Edep",
-		// 											10000,0.,100.*keV,"keV");
-
-		// cell_hist_id = analysisManager->CreateH2("Cell plot of counts","Counts per cell",
-		// 											2*(det_obj->GetHexCols())+1,0,2*(det_obj->GetHexCols())+1,
-		// 											det_obj->GetHexRows(),0,det_obj->GetHexRows());
-
-		// cell_edep_hist_id = analysisManager->CreateH2("Cell plot of cumulative Edep","Energy deposited per cell",
-		// 											2*(det_obj->GetHexCols())+1,0,2*(det_obj->GetHexCols())+1,
-		// 											det_obj->GetHexRows(),0,det_obj->GetHexRows());
-
-		// G4int hexrows = det_obj->GetHexRows(),hexcols = det_obj->GetHexCols();
-		// G4int hexcount = (hexrows/2)*(2*hexcols+1)+(hexrows%2)*hexcols;
-		// auto inv_hex_map = [hexcols](G4int hex){
-		// 	G4int q1 = hex/(2*hexcols+1);
-		// 	G4int r1 = hex%(2*hexcols+1);
-		// 	std::pair<G4int,G4int> rowcol;
-		// 	rowcol.first = 2*q1+(r1>=hexcols);
-		// 	rowcol.second = 2*r1+(r1>=hexcols?-2*hexcols:1);
-		// 	return rowcol;
-		// };
-		// rc_edep = new std::map<int,G4int>();
-		// for(int hexNo=0;hexNo<hexcount;hexNo++){
-		// 	G4String name = "Events vs Edep in cell " + std::to_string(hexNo);
-		// 	G4String title = "Number of events as a function of Edep in cell " + std::to_string(hexNo);
-		// 	rc_edep->insert({hexNo,-1});
-		// 	rc_edep->at(hexNo) = analysisManager->CreateH1(name,title,10000,0.,100.*keV,"keV");
-		// }
 	}
 
 	void RunAction::BeginOfRunAction(const G4Run* aRun){

@@ -1,4 +1,4 @@
-{
+void plotCell(){
 	auto f = new TFile("hex.root");
 	auto c1 = new TCanvas("c1","",1920,640);
 	c1->Divide(2,1);

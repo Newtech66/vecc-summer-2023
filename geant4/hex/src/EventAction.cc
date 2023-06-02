@@ -16,9 +16,6 @@ namespace Hex{
 	void EventAction::EndOfEventAction(const G4Event* anEvent){
 		auto run = static_cast<const RunAction*>(G4RunManager::GetRunManager()->GetUserRunAction());
 		G4int tupleid = run->GetNtupleId();
-		// G4int eventhistid = run->GetEventHistId();
-		// G4int cellhistid = run->GetCellHistId();
-		// G4int celledephistid = run->GetCellEdepHistId();
 
 		auto analysisManager = G4AnalysisManager::Instance();
 		auto HC = anEvent->GetHCofThisEvent()->GetHC(0);
@@ -34,22 +31,16 @@ namespace Hex{
 		};
 
 		std::map<G4int,G4double> totalEdep;	//{hexNumber,totalEdep}
-		// G4double EdepOfEvent = 0.;
 		G4int nofHits = HC->GetSize();
 		for(int i = 0;i < nofHits;i++){
 			auto hit = static_cast<TrackerHit*>(HC->GetHit(i));
 			totalEdep[hit->GetChamberNb()] += hit->GetEdep();
-			// EdepOfEvent += hit->GetEdep();
 		}
-		// if(EdepOfEvent>0.)	analysisManager->FillH1(eventhistid,EdepOfEvent);
 		for(auto [hexNo,Edep]:totalEdep){
 			analysisManager->FillNtupleIColumn(tupleid,0,anEvent->GetEventID());
 			analysisManager->FillNtupleIColumn(tupleid,1,hexNo);
 			analysisManager->FillNtupleDColumn(tupleid,2,Edep/keV);
 			analysisManager->AddNtupleRow();
-			// analysisManager->FillH2(cellhistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first);
-			// analysisManager->FillH2(celledephistid,inv_hex_map(hexNo).second,inv_hex_map(hexNo).first,Edep);
-			//analysisManager->FillH1(run->GetRCEdepHistId(hexNo),Edep);
 		}
 	}
 }
