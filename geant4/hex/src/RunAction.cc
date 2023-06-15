@@ -16,6 +16,7 @@ namespace Hex{
 		analysisManager->CreateNtupleIColumn("Event");
 		analysisManager->CreateNtupleIColumn("Cell");
 		analysisManager->CreateNtupleDColumn("Edep");
+		analysisManager->CreateNtupleIColumn("Particle");
 		analysisManager->FinishNtuple();
 	}
 

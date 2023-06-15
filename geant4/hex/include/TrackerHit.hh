@@ -35,6 +35,7 @@ class TrackerHit : public G4VHit
     void Print() override;
 
     // Set methods
+    void SetParticleName(G4String name) { fParticleName = name; };
     void SetTrackID  (G4int track)      { fTrackID = track; };
     void SetChamberNb(G4int chamb)      { fChamberNb = chamb; };
     void SetEdep     (G4double de)      { fEdep = de; };
@@ -42,12 +43,14 @@ class TrackerHit : public G4VHit
     void SetTime     (G4double time)    { fTime = time; };
 
     // Get methods
+    G4String GetParticleName() const { return fParticleName; };
     G4int GetTrackID() const     { return fTrackID; };
     G4int GetChamberNb() const   { return fChamberNb; };
     G4double GetEdep() const     { return fEdep; };
     G4ThreeVector GetPos() const { return fPos; };
 
   private:
+    G4String      fParticleName;
     G4int         fTrackID = -1;
     G4int         fChamberNb = -1;
     G4double      fEdep = 0.;

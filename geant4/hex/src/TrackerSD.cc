@@ -45,6 +45,7 @@ G4bool TrackerSD::ProcessHits(G4Step* aStep,
 
   auto newHit = new TrackerHit();
 
+  newHit->SetParticleName(aStep->GetTrack()->GetParticleDefinition()->GetParticleName());
   newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
   newHit->SetChamberNb(aStep->GetPreStepPoint()->GetTouchableHandle()
                                                ->GetCopyNumber());

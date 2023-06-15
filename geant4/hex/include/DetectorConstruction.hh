@@ -20,8 +20,8 @@ namespace Hex{
 
 	private:
 		G4ThreeVector hexarr_center;
-		G4int hex_rows = 10;
-		G4int hex_cols = 5;
+		G4int hex_rows = 20;
+		G4int hex_cols = 10;
 		G4int hex_count = 0;
 		std::vector<G4LogicalVolume*>* fLogHex = nullptr;
 		G4UserLimits* fGasStepLimit = nullptr;
