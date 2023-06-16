@@ -20,12 +20,17 @@
 namespace Hex{
 	DetectorConstruction::DetectorConstruction(){
 		fLogHex = new std::vector<G4LogicalVolume*>();
+		fMan = G4NistManager::Instance();
 	}
 
 	DetectorConstruction::~DetectorConstruction(){
 		delete fLogHex;
 		delete fGasStepLimit;
 		delete fConvStepLimit;
+	}
+
+	G4VPhysicalVolume* CreateHexAssembly(){
+
 	}
 
 	G4VPhysicalVolume* DetectorConstruction::Construct(){
@@ -73,6 +78,18 @@ namespace Hex{
 			}
 		}
 		hexarr_center /= hex_count;
+		assemblyHex->AddPlacedVolume(logHex,tr_hex);
+		for(int row = 0;row < hex_rows;row++){
+			G4ThreeVector t_hexarr;
+			G4double shift = 0.*mm;
+			if(row % 2 == 1)	shift = -hex_rout;
+			for(int col = 0;col < hex_cols+(row%2);col++){
+				t_hexarr.setX(shift+col*hex_rout*2);
+				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
+				G4Transform3D tr_hexarr(r_hex,t_hexarr);
+				assemblyHex->MakeImprint(logWorld,tr_hexarr); 
+			}
+		}
 
 		//Ar-CO2 mixture
 		auto Ar = man->FindOrBuildMaterial("G4_Ar");

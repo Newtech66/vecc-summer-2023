@@ -4,6 +4,7 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4UserLimits.hh"
+#include "G4NistManager.hh"
 
 #include <vector>
 
