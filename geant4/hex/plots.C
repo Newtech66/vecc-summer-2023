@@ -16,9 +16,10 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
     //There is a tree (ntuple) named Hits
     //It has branches: Event, Cell, Edep
     TTree* hits = (TTree*)f->Get("Hits");
-    Int_t event,cell,pid;
+    Int_t event,layer,cell,pid;
     Double_t edep;
     hits->SetBranchAddress("Event",&event);
+    hits->SetBranchAddress("Layer",&layer);
     hits->SetBranchAddress("Cell",&cell);
     hits->SetBranchAddress("Edep",&edep);
     // hits->SetBranchAddress("Particle",&pid);
@@ -26,6 +27,7 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
     map<Int_t,Double_t> evsum,evmax,evcell;
     for(int iHit = 0;hits->LoadTree(iHit) >= 0; iHit++){
         hits->GetEntry(iHit);
+        if(layer == 1)  continue;
         evcellsum[event][cell] += edep;
         evsum[event] += edep;
     }

@@ -20,17 +20,12 @@
 namespace Hex{
 	DetectorConstruction::DetectorConstruction(){
 		fLogHex = new std::vector<G4LogicalVolume*>();
-		fMan = G4NistManager::Instance();
 	}
 
 	DetectorConstruction::~DetectorConstruction(){
 		delete fLogHex;
 		delete fGasStepLimit;
 		delete fConvStepLimit;
-	}
-
-	G4VPhysicalVolume* CreateHexAssembly(){
-
 	}
 
 	G4VPhysicalVolume* DetectorConstruction::Construct(){
@@ -56,7 +51,7 @@ namespace Hex{
 										hex_zplanes,hex_rinner,hex_router);
 		auto logHex = new G4LogicalVolume(solidHex,hex_mat,"hex");
 
-		//hexagon assembly
+		//hexagon assembly - pre shower plane
 		auto assemblyHex = new G4AssemblyVolume();
 		G4ThreeVector t_hex;
 		G4RotationMatrix r_hex;
@@ -78,18 +73,6 @@ namespace Hex{
 			}
 		}
 		hexarr_center /= hex_count;
-		assemblyHex->AddPlacedVolume(logHex,tr_hex);
-		for(int row = 0;row < hex_rows;row++){
-			G4ThreeVector t_hexarr;
-			G4double shift = 0.*mm;
-			if(row % 2 == 1)	shift = -hex_rout;
-			for(int col = 0;col < hex_cols+(row%2);col++){
-				t_hexarr.setX(shift+col*hex_rout*2);
-				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
-				G4Transform3D tr_hexarr(r_hex,t_hexarr);
-				assemblyHex->MakeImprint(logWorld,tr_hexarr); 
-			}
-		}
 
 		//Ar-CO2 mixture
 		auto Ar = man->FindOrBuildMaterial("G4_Ar");
@@ -105,9 +88,9 @@ namespace Hex{
 		fGasStepLimit = new G4UserLimits(gasMaxStep);
 
 		//gas detectors
-		G4double gas_depth = 5.0*mm;
+		G4double gas_depth = hex_depth;
 		G4double gas_rin = 0.0*mm;
-		G4double gas_thickness = 5.0*mm;
+		G4double gas_thickness = hex_rin;
 		G4double gas_zplanes[] = {0.0*mm,gas_depth};
 		G4double gas_rinner[] = {gas_rin,gas_rin};
 		G4double gas_router[] = {gas_rin+gas_thickness,gas_rin+gas_thickness};
@@ -153,6 +136,39 @@ namespace Hex{
 		t_conv += hexarr_center;
 		auto physConv = new G4PVPlacement(nullptr,t_conv,logConv,"Converter",
 											logWorld,false,0,fCheckOverlaps);
+		
+		//hexagon assembly - charged particle veto
+		for(int row = 0;row < hex_rows;row++){
+			G4ThreeVector t_hexarr;
+			G4double shift = 0.*mm;
+			if(row % 2 == 1)	shift = -hex_rout;
+			for(int col = 0;col < hex_cols+(row%2);col++){
+				t_hexarr.setX(shift+col*hex_rout*2);
+				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
+				t_hexarr.setZ(-conv_depth-air_gap-hex_depth);
+				G4Transform3D tr_hexarr(r_hex,t_hexarr);
+				assemblyHex->MakeImprint(logWorld,tr_hexarr); 
+			}
+		}
+
+		//gas detectors - charged particle veto
+		for(int row = 0,copyNo = 0;row < hex_rows;row++){
+			G4double gas_R = (hex_thickness+gas_thickness);
+			G4ThreeVector t_gasarr;
+			G4double shift = 0.*mm;
+			if(row % 2 == 1)	shift = -gas_R;
+			for(int col = 0;col < hex_cols+(row%2);col++,copyNo++){
+				t_gasarr.setX(shift+col*gas_R*2);
+				t_gasarr.setY(row*tan(twopi/6.0)*gas_R);
+				t_gasarr.setZ(-conv_depth-air_gap-gas_depth);
+				G4Transform3D tr_gasarr(r_gas,t_gasarr);
+				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",
+														nullptr,nullptr,nullptr));
+				fLogHex->back()->SetUserLimits(fGasStepLimit);
+				new G4PVPlacement(tr_gasarr,fLogHex->back(),"DetectorPV",logWorld,
+									false,(G4int)fLogHex->size()-1,fCheckOverlaps);
+			}
+		}
 
 		//FR4 plates
 

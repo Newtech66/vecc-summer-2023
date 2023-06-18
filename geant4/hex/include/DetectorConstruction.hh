@@ -17,6 +17,7 @@ namespace Hex{
 		G4ThreeVector GetHexAssemblyCenter() const { return hexarr_center; }
 		G4int GetHexRows() const { return hex_rows; }
 		G4int GetHexCols() const { return hex_cols; }
+		G4int GetHexCount() const { return hex_count; }
 		void ConstructSDandField() override;
 
 	private:

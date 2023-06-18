@@ -14,15 +14,16 @@ namespace Hex{
 		analysisManager->SetNtupleMerging(true);
 		ntuple_id = analysisManager->CreateNtuple("Hits","");
 		analysisManager->CreateNtupleIColumn("Event");
+		analysisManager->CreateNtupleIColumn("Layer"); 	//0 is PSP, 1 is CPV
 		analysisManager->CreateNtupleIColumn("Cell");
 		analysisManager->CreateNtupleDColumn("Edep");
-		analysisManager->CreateNtupleIColumn("Particle");
+		// analysisManager->CreateNtupleIColumn("Particle");
 		analysisManager->FinishNtuple();
 	}
 
 	void RunAction::BeginOfRunAction(const G4Run* aRun){
 		auto analysisManager = G4AnalysisManager::Instance();
-		G4String fileName = "../hex_10000MeV.root";
+		G4String fileName = "../hex_10MeV.root";
 		analysisManager->OpenFile(fileName);
 
 	}
