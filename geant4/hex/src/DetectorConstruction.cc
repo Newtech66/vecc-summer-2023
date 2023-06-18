@@ -39,7 +39,7 @@ namespace Hex{
 		auto physWorld = new G4PVPlacement(nullptr,G4ThreeVector(),logWorld,"World",
 											nullptr,false,0,fCheckOverlaps);
 		//hexagon
-		auto hex_mat = man->FindOrBuildMaterial("G4_Cu");
+		auto hex_mat = man->FindOrBuildMaterial("G4_AIR");
 		G4double hex_depth = 5.0*mm;
 		G4double hex_rin = 5.0*mm;
 		G4double hex_thickness = 0.2*mm;
@@ -121,7 +121,7 @@ namespace Hex{
 
 		//lead converter
 		auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
-		G4double conv_depth = 6*(0.5*cm);	//6*X0
+		G4double conv_depth = 3*(0.5*cm);	//3*X0
 		G4double air_gap = 3*mm;
 		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
 		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");

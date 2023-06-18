@@ -20,7 +20,7 @@ namespace Hex{
 		G4String particleName;
 		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
 		fParticleGun->SetParticleDefinition(particle);
-		fParticleGun->SetParticleEnergy(10.*MeV);
+		fParticleGun->SetParticleEnergy(1000.*MeV);
 	}
 
 	PrimaryGeneratorAction::~PrimaryGeneratorAction(){
