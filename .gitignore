@@ -1,4 +1,4 @@
 build/
 .git*
-data/
+data*/
 *.root
