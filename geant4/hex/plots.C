@@ -7,11 +7,8 @@
 
 using namespace std;
 
-TH1D *f1 = nullptr;
-TH1D* f2 = nullptr;
-
-tuple<Int_t,Double_t,Double_t> func(int energy){
-    string filename = "../hex_"+to_string(energy)+"MeV.root";
+tuple<Double_t,Double_t,Double_t> func(int energy){
+    string filename = "../data_cu_0.1/hex_"+to_string(energy)+"MeV.root";
     TFile* f = new TFile(filename.data());
     //There is a tree (ntuple) named Hits
     //It has branches: Event, Cell, Edep
@@ -24,7 +21,7 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
     hits->SetBranchAddress("Edep",&edep);
     // hits->SetBranchAddress("Particle",&pid);
     map<Int_t,map<Int_t,Double_t>> evcellsum;
-    map<Int_t,Double_t> evsum,evmax,evcell; //sum, max, cells
+    map<Int_t,Double_t> evsum,evmax,evcell,evmaxfrac; //sum, max, cells, max frac
     for(int iHit = 0;hits->LoadTree(iHit) >= 0; iHit++){
         hits->GetEntry(iHit);
         if(layer == 1)  continue;
@@ -40,6 +37,10 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
         evmax[p.first] = mx;
     }
 
+    for(auto p:evsum){
+        evmaxfrac[p.first] = evmax[p.first]/p.second;
+    }
+
     TH1D* t1 = new TH1D("evsum","",10000,0,100);
     for(auto p:evsum){
         t1->Fill(p.second);
@@ -47,15 +48,20 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
     auto result_sum = t1->Fit("landau","S Q N");
     Double_t sum = *(result_sum->GetParams()+1);
 
-    TH1D* t2 = new TH1D("evmax","",10000,0,100);
-    for(auto p:evmax){
+    TH1D* t2 = new TH1D("evmaxfrac","",10000,0,100);
+    for(auto p:evmaxfrac){
         t2->Fill(p.second);
     }
-    auto result_max = t2->Fit("landau","S Q N");
-    Double_t max = *(result_max->GetParams()+1);
+    t2->Draw();
+    auto result_max_frac = t2->Fit("landau","S Q N");
+    //auto c1 = new TCanvas("c1","",1920,1080);
+    //c1->cd(1);
+    //t2->Draw();
+    Double_t max_frac = *(result_max_frac->GetParams()+1);
 
-    TH1D* t3 = new TH1D("evcell","",220,0,220);
+    TH1D* t3 = new TH1D("evcell","",220,-0.5,219.5);
     for(auto p:evcell){
+        // if(p.second == 1)   continue;
         t3->Fill(p.second);
     }
     //auto c1 = new TCanvas("c1","",1920,1080);
@@ -66,25 +72,24 @@ tuple<Int_t,Double_t,Double_t> func(int energy){
     //     t4->Fill(p.second,evsum[p.first]);
     // }
     // t4->Draw("HIST");
-    auto result_cell = t3->Fit("landau","S Q N");
-    Double_t ncell = *(result_cell->GetParams()+1);
-    f->Close();
-    delete f;
+    Double_t ncell = t3->GetMean(1);
+    //f->Close();
+    //delete f;
     //return make_tuple(0,0,0);
-    return make_tuple(ncell,max,sum);
+    return make_tuple(ncell,max_frac,sum);
 }
 
 void plots(){
-    vector<Double_t> energies{10,50,100,200,500,1000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
     vector<Double_t> ncells;
     vector<Double_t> sum_edep,max_edep_frac;
     for(auto energy:energies){
-        Int_t ncell;
-        Double_t sume,maxe;
-        tie(ncell,maxe,sume) = func(energy);
+        Double_t ncell;
+        Double_t sume,max_frace;
+        tie(ncell,max_frace,sume) = func(energy);
         ncells.push_back(ncell);
         sum_edep.push_back(sume);
-        max_edep_frac.push_back(maxe/sume);
+        max_edep_frac.push_back(max_frace);
     }
     for(auto x:ncells)  cout<<x<<" ";cout<<endl;
     for(auto x:sum_edep)  cout<<x<<" ";cout<<endl;
@@ -102,12 +107,15 @@ void plots(){
     c1->Divide(2,2);
     c1->cd(1);
     TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),ncells.data());
+    g1->SetTitle("NCells vs gamma energy;Gamma energy (MeV);NCells");
     g1->Draw(drawopts.data());
     c1->cd(2);
     TGraph* g2 = new TGraph((Int_t)energies.size(),energies.data(),sum_edep.data());
+    g2->SetTitle("Sum of Edep vs gamma energy;Gamma energy (MeV);Sum of Edep (MPV)");
     g2->Draw(drawopts.data());
     c1->cd(3);
     TGraph* g3 = new TGraph((Int_t)energies.size(),energies.data(),max_edep_frac.data());
+    g3->SetTitle("Max Edep fraction vs gamma energy;Gamma energy (MeV);Max Edep fraction (MPV)");
     g3->Draw(drawopts.data());
     c1->cd(4);
     vector<pair<Double_t,Double_t>> ncells_copy;
@@ -118,5 +126,6 @@ void plots(){
     sort(ncells_copy.begin(),ncells_copy.end());
     for(auto p:ncells_copy) a_c.push_back(p.first), b_c.push_back(p.second);
     TGraph* g4 = new TGraph((Int_t)ncells.size(),a_c.data(),b_c.data());
+    g4->SetTitle("Max Edep fraction vs NCells;NCells;Max Edep fraction (MPV)");
     g4->Draw(drawopts.data());
 }

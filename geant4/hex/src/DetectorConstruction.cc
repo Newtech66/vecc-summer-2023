@@ -42,7 +42,7 @@ namespace Hex{
 		auto hex_mat = man->FindOrBuildMaterial("G4_AIR");
 		G4double hex_depth = 5.0*mm;
 		G4double hex_rin = 5.0*mm;
-		G4double hex_thickness = 0.2*mm;
+		G4double hex_thickness = 0.1*mm;
 		G4double hex_rout = hex_rin+hex_thickness;
 		G4double hex_zplanes[] = {0.0*mm,hex_depth};
 		G4double hex_rinner[] = {hex_rin,hex_rin};

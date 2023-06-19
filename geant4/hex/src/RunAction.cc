@@ -23,7 +23,7 @@ namespace Hex{
 
 	void RunAction::BeginOfRunAction(const G4Run* aRun){
 		auto analysisManager = G4AnalysisManager::Instance();
-		G4String fileName = "../hex_1000MeV.root";
+		G4String fileName = "../data_cu_0.1/hex_10000MeV.root";
 		analysisManager->OpenFile(fileName);
 
 	}
