@@ -48,7 +48,7 @@ tuple<Double_t,Double_t,Double_t> func(int energy){
     auto result_sum = t1->Fit("landau","S Q N");
     Double_t sum = *(result_sum->GetParams()+1);
 
-    TH1D* t2 = new TH1D("evmaxfrac","",10000,0,100);
+    TH1D* t2 = new TH1D("evmaxfrac","",1000,0,1);
     for(auto p:evmaxfrac){
         t2->Fill(p.second);
     }
@@ -67,6 +67,7 @@ tuple<Double_t,Double_t,Double_t> func(int energy){
     //auto c1 = new TCanvas("c1","",1920,1080);
     //c1->cd(1);
     //t3->Draw("HIST");
+
     //TH2D* t4 = new TH2D("ncell_edep","",100,0,100,10000,0,100);
     // for(auto p:evcell){
     //     t4->Fill(p.second,evsum[p.first]);
