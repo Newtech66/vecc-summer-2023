@@ -20,7 +20,7 @@ namespace Hex{
 		G4String particleName;
 		G4ParticleDefinition* particle = particleTable->FindParticle(particleName="gamma");
 		fParticleGun->SetParticleDefinition(particle);
-		fParticleGun->SetParticleEnergy(10000.*MeV);
+		fParticleGun->SetParticleEnergy(5000.*MeV);
 	}
 
 	PrimaryGeneratorAction::~PrimaryGeneratorAction(){
@@ -29,7 +29,8 @@ namespace Hex{
 
 	void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 		auto det_obj = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-		fParticleGun->SetParticlePosition(det_obj->GetHexAssemblyCenter() + G4ThreeVector(.0*cm,.0*cm,-10.*cm));
+		//det_obj->GetHexAssemblyCenter() + 
+		fParticleGun->SetParticlePosition(G4ThreeVector(.0*cm,.0*cm,-10.*cm));
 		//G4double minTheta = -pi/10,maxTheta = pi/10;
 		//G4double rand_x = (G4UniformRand()-0.5)/2,rand_y = (G4UniformRand()-0.5)/5;
 		G4double rand_x = 0.,rand_y = 0.;

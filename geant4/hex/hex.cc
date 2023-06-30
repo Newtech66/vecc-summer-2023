@@ -8,6 +8,8 @@
 #include "G4VisExecutive.hh"
 #include "QBBC.hh"
 #include "G4StepLimiterPhysics.hh"
+#include "G4EmStandardPhysics.hh"
+// #include "G4EmStandardPhysics_option3.hh"
 #include "globals.hh"
 
 class G4VModularPhysicsList;
@@ -25,7 +27,9 @@ int main(int argc,char* argv[])
 
     //initialise the physics list
     //runmanager->SetUserInitialization(new PhysicsList);
-    G4VModularPhysicsList* physicsList = new QBBC;
+    // G4VModularPhysicsList* physicsList = new QBBC;
+    G4VModularPhysicsList* physicsList = new G4VModularPhysicsList();
+    physicsList->RegisterPhysics(new G4EmStandardPhysics());
     physicsList->RegisterPhysics(new G4StepLimiterPhysics());
     physicsList->SetVerboseLevel(0);
     runmanager->SetUserInitialization(physicsList);

@@ -1,0 +1,19 @@
+//5 GeV
+y = 62
+e = 8
+y/e = 8
+//1 GeV
+y = 30
+e = 3
+y/e = 10
+//100 MeV
+y = 7
+e = 0.5
+y/e = 14
+
+with increasing energy, number of bremsstrahlung emitted decreases
+bremsstrahlung loss increases linearly with energy
+radiation length is distance over which energy becomes 1/e due to radiation loss only
+can we explain the observation with these?
+pair production cross section increases with energy
+true for bremsstrahlung as well (?)
