@@ -1,11 +1,14 @@
-#include <vector>
-#include <memory>
-#include <iostream>
-#include "TCanvas.h"
-#include "TFile.h"
-#include "TTree.h"
+#include "cluster.C"
 
-using namespace std;
+pair<int,int> inv_hex_map(int hex){
+    int hexcount = (hexrows/2)*(2*hexcols+1)+(hexrows%2)*hexcols;
+    int q1 = hex/(2*hexcols+1);
+    int r1 = hex%(2*hexcols+1);
+    std::pair<int,int> rowcol;
+    rowcol.first = 2*q1+(r1>=hexcols);
+    rowcol.second = 2*r1+(r1>=hexcols?-2*hexcols:1);
+    return rowcol;
+}
 
 tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
     string filename = pref+to_string(energy)+"MeV.root";
@@ -21,6 +24,7 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
     hits->SetBranchAddress("Edep",&edep);
     // hits->SetBranchAddress("Particle",&pid);
     map<Int_t,map<Int_t,Double_t>> evcellsum;
+    map<Int_t,Int_t> evclust;
     map<Int_t,Double_t> evsum,evmax,evcell,evmaxfrac; //sum, max, cells, max frac
     for(int iHit = 0;hits->LoadTree(iHit) >= 0; iHit++){
         hits->GetEntry(iHit);
@@ -52,7 +56,7 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
     for(auto p:evmaxfrac){
         t2->Fill(p.second);
     }
-    t2->Draw();
+    //t2->Draw();
     //auto c1 = new TCanvas("c1","",1920,1080);
     //c1->cd(1);
     //t2->Draw();
@@ -73,6 +77,17 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
     // }
     // t4->Draw("HIST");
     Double_t ncell = t3->GetMean(1);
+
+    TH1D* t4 = new TH1D("evclust","",5,0,5);
+    for(auto p:evcellsum){
+        vector<pair<Int_t,Int_t>> data;
+        for(auto cell:p.second){
+            data.push_back(inv_hex_map(cell.first));
+        }
+        evclust[p.first]=cluster(data);
+        t4->Fill(evclust[p.first]);
+    }
+    t4->Draw();
     //f->Close();
     //delete f;
     //return make_tuple(0,0,0);
@@ -86,7 +101,7 @@ void plots(){
     for(auto energy:energies){
         Double_t ncell;
         Double_t sume,max_frace;
-        tie(ncell,max_frace,sume) = func("../data_cu/",energy);
+        tie(ncell,max_frace,sume) = func("./hex_",energy);
         ncells.push_back(ncell);
         sum_edep.push_back(sume);
         max_edep_frac.push_back(max_frace);
@@ -94,14 +109,7 @@ void plots(){
     for(auto x:ncells)  cout<<x<<" ";cout<<endl;
     for(auto x:sum_edep)  cout<<x<<" ";cout<<endl;
     for(auto x:max_edep_frac)  cout<<x<<" ";cout<<endl;
-    // auto inv_hex_map = [hexcols](G4int hex){
-    //     G4int q1 = hex/(2*hexcols+1);
-    //     G4int r1 = hex%(2*hexcols+1);
-    //     std::pair<G4int,G4int> rowcol;
-    //     rowcol.first = 2*q1+(r1>=hexcols);
-    //     rowcol.second = 2*r1+(r1>=hexcols?-2*hexcols:1);
-    //     return rowcol;
-    // };
+
     string drawopts = "AL*";
     auto c1 = new TCanvas("c1","",1920,1080);
     c1->Divide(2,2);

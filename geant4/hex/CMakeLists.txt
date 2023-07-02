@@ -24,6 +24,8 @@ plotHisto.C
 plotCell.C
 plotPerCellEdep.C
 plots.C
+cluster.C
+checkev.C
 )
 
 foreach(_script ${HEX_SCRIPTS})
