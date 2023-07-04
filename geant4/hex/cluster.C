@@ -4,12 +4,12 @@
 
 const int dx[]={1,0,-1,1,0,-1};
 const int dy[]={-1,-2,-1,1,2,1};
-const int hexcols=20;
-const int hexrows=10;
-const int minPts=2;
+const int hexcols=10;
+const int hexrows=20;
+const int minPts=1;
 
 bool ok(int r,int c){
-    return r>=0 && r<hexrows && c>=0 && c<hexcols;
+    return r>=0 && r<hexrows && c>=0 && c<2*hexcols+1;
 }
 
 vector<Int_t> rangeQuery(int r,int c,map<pair<Int_t,Int_t>,Int_t>& idx){
@@ -43,6 +43,7 @@ Int_t cluster(vector<pair<Int_t,Int_t>>& data){
         cl++;
         clust[pt]=cl;
         vector<Int_t> seedSet{N.begin(),N.end()};
+        seedSet.reserve(1000);
         for(auto q:seedSet){
             if(q==pt)   continue;
             if(clust[q]==-1)    clust[q]=cl;
