@@ -25,7 +25,10 @@ plotCell.C
 plotPerCellEdep.C
 plots.C
 cluster.C
+clusterreal.C
 checkev.C
+checkevreal.C
+countperev.C
 )
 
 foreach(_script ${HEX_SCRIPTS})
