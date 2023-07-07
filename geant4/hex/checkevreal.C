@@ -1,6 +1,6 @@
 #include "clusterreal.C"
 
-void get_data(int module,int event,vector<tuple<Int_t,Int_t,Double_t>> &evcells){
+void get_data(int detector,int module,int event,vector<tuple<Int_t,Int_t,Double_t>> &evcells){
     string filename = "../AnalysisResults.root";
     TFile* f = new TFile(filename.data());
     if(f == nullptr){
@@ -28,19 +28,18 @@ void get_data(int module,int event,vector<tuple<Int_t,Int_t,Double_t>> &evcells)
 
     for(int iHit = 0;hits->LoadTree(iHit) >= 0; iHit++){
         hits->GetEntry(iHit);
-         // && evt==event
-        if(det==0 && smn==module && evt==event){
+        if(det==detector && smn==module && evt==event){
             evcells.push_back({row,col,edep});
         }
     }
 }
 
-TH2Poly* event_histo(int module,int event){
+TH2Poly* event_histo(int detector,int module,int event){
     vector<tuple<Int_t,Int_t,Double_t>> evcells;
-    get_data(module,event,evcells);
+    get_data(detector,module,event,evcells);
 
     TH2Poly* seehits = new TH2Poly();
-    seehits->SetTitle("Event display");
+    // seehits->SetTitle("Event display");
     seehits->Honeycomb(0,0,1,hexcols+1,hexrows);
     for(auto p:evcells){
         Double_t mvr = sqrt(3)/2;
@@ -54,21 +53,20 @@ TH2Poly* event_histo(int module,int event){
         }
     }
     return seehits;
-
-    // TCanvas* c1 = new TCanvas("event_display","",1920,800);
-    // gStyle->SetOptStat(0);
-    // seehits->Draw("collz");
 }
 
-void event_display(int module,int event){
-    TH2Poly* seehits = event_histo(module,event);
+void event_display(int detector,int module,int event){
+    TH2Poly* seehits = event_histo(detector,module,event);
+    string title = "Event display of event " + to_string(event)+ " in module " + to_string(module) + " in " + (detector==0?"PRE":"CPV") + " plane";
     TCanvas* c1 = new TCanvas("event_display","",1920,800);
-    // gStyle->SetOptStat(0);
+    gStyle->SetOptStat(0);
+    seehits->SetTitle(title.data());
     seehits->Draw("collz");
 }
 
-void event_display_all_modules(int event){
-    TCanvas* c1 = new TCanvas("event_display","",1920,800);
+void event_display_all_modules(int detector,int event){
+    string title = "Event display of event " + to_string(event) + " in " + (detector==0?"PRE":"CPV") + " plane";
+    TCanvas* c1 = new TCanvas("event_display_all_modules",title.data(),1920,800);
     c1->Divide(5,4);
     TH2Poly* seehits;
     int curPad=1;
@@ -76,7 +74,7 @@ void event_display_all_modules(int event){
     for(int smn=0;smn<24;smn++){
         if(smn==0 || smn==6 || smn==13 || smn==19)  continue;
         c1->cd(curPad);
-        seehits = event_histo(smn,event);
+        seehits = event_histo(detector,smn,event);
         string title = "Module number "+to_string(smn);
         seehits->SetTitle(title.data());
         seehits->Draw("collz");
@@ -84,31 +82,28 @@ void event_display_all_modules(int event){
     }
 }
 
-//Events with <=2000 hits
-// 2
-// 7
-// 9
-// 10
-// 11
-// 12
-// 18
-// 19
-// 27
-// 31
-// 32
-// 36
-// 43
-// 44
-// 45
-// 47
-// 51
-// 56
-
-// Events with 1000 <= hits <= 2000
-// 7
-// 9
-// 12
-// 44
-// 51
-
-//Events | Hits
+void adcspec(int detector,int module){
+    string title = "ADC spectrum for isolated cells in module " + to_string(module) + " in " + (detector==0?"PRE":"CPV") + " plane";
+    TH1D* adcspec = new TH1D("adcspec",title.data(),18000,0,1800);
+    for(int event=0;event<56;event++){
+        vector<tuple<Int_t,Int_t,Double_t>> evcells;
+        get_data(detector,module,event,evcells);
+        vector<pair<Int_t,Int_t>> cells;
+        for(auto p:evcells) cells.push_back({get<0>(p),get<1>(p)});
+        vector<Int_t> cl = cluster(cells);
+        map<Int_t,Int_t> cnts;
+        for(auto label:cl)  cnts[label]++;
+        vector<Int_t> single_labels;
+        for(auto p:cnts){
+            if(p.first<0)   continue;
+            if(p.second==1) single_labels.push_back(p.first);
+        }
+        for(int cell = 0;cell<cl.size();cell++){
+            if(binary_search(single_labels.begin(),single_labels.end(),cl[cell])){
+                adcspec->Fill(get<2>(evcells[cell]));
+            }
+        }
+    }
+    TCanvas* c1 = new TCanvas("adcspec","",1920,800);
+    adcspec->Draw();
+}

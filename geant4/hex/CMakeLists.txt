@@ -29,6 +29,7 @@ clusterreal.C
 checkev.C
 checkevreal.C
 countperev.C
+backscatter.C
 )
 
 foreach(_script ${HEX_SCRIPTS})

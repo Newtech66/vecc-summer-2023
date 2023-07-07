@@ -109,10 +109,14 @@ void event_display(int energy,int cell_cut){
     seehits->Honeycomb(0,0,1,hexcols+1,hexrows);
     for(auto p:evcells){
         if(get<0>(p)!=key)   continue;
-        double mvup = 2/sqrt(3);
+        Double_t mvr = sqrt(3)/2;
         int row,col;
         tie(row,col)=inv_hex_map(get<1>(p));
-        seehits->Fill(1+col,mvup+1+row,get<2>(p));
+        if(row%2==0){
+            seehits->Fill(mvr*(1+col),1+1.5*row,get<2>(p));
+        }else{
+            seehits->Fill(mvr*(1+col),1+1.5*row,get<2>(p));
+        }
     }
     // gStyle->SetOptStat(0);
     seehits->Draw("colz text");

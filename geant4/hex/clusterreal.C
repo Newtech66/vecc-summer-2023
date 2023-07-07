@@ -23,7 +23,7 @@ vector<Int_t> rangeQuery(int r,int c,map<pair<Int_t,Int_t>,Int_t>& idx){
     return N;
 }
 
-Int_t cluster(vector<pair<Int_t,Int_t>>& data){
+vector<Int_t> cluster(vector<pair<Int_t,Int_t>>& data){
     //how to get the neighbourhood of a hexagonal array
     map<pair<Int_t,Int_t>,Int_t> idx;
     for(int i=0;i<(int)data.size();i++){
@@ -56,6 +56,6 @@ Int_t cluster(vector<pair<Int_t,Int_t>>& data){
             }
         }
     }
-    return cl;
-    // return clust;
+    // return cl;
+    return clust;
 }
