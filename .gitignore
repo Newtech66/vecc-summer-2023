@@ -1,4 +1,4 @@
 build/
 data_*/
-
+*.root
 

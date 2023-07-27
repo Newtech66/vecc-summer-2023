@@ -29,8 +29,8 @@ namespace Hex{
 
 	void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
 		auto det_obj = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-		//det_obj->GetHexAssemblyCenter() + 
-		fParticleGun->SetParticlePosition(G4ThreeVector(.0*cm,.0*cm,-10.*cm));
+		// 
+		fParticleGun->SetParticlePosition(det_obj->GetHexAssemblyCenter() + G4ThreeVector(.0*cm,.0*cm,-10.*cm));
 		//G4double minTheta = -pi/10,maxTheta = pi/10;
 		//G4double rand_x = (G4UniformRand()-0.5)/2,rand_y = (G4UniformRand()-0.5)/5;
 		G4double rand_x = 0.,rand_y = 0.;

@@ -24,14 +24,14 @@ namespace Hex{
 
 	DetectorConstruction::~DetectorConstruction(){
 		delete fLogHex;
-		// delete fGasStepLimit;
+		delete fGasStepLimit;
 		delete fConvStepLimit;
 	}
 
 	G4VPhysicalVolume* DetectorConstruction::Construct(){
 		G4NistManager* man = G4NistManager::Instance();
 
-		//world
+		//world definition and placement
 		auto world_mat = man->FindOrBuildMaterial("G4_AIR");
 		G4double world_x = 1*m, world_y = 1*m, world_z = 1*m;
 		auto solidWorld = new G4Box("World",world_x,world_y,world_z);
@@ -39,21 +39,21 @@ namespace Hex{
 		auto physWorld = new G4PVPlacement(nullptr,G4ThreeVector(),logWorld,"World",
 											nullptr,false,0,fCheckOverlaps);
 		//hexagon definition Preshower
-		auto hexPre_mat = man->FindOrBuildMaterial("G4_AIR");
-		G4double hexPre_depth = 5.0*mm;
-		G4double hexPre_rin = 5.0*mm;
-		G4double hexPre_thickness = 0.1*mm;
-		G4double hexPre_rout = hexPre_rin+hexPre_thickness;
+		auto hexPre_mat = man->FindOrBuildMaterial("G4_Cu");
+		G4double hexPre_depth = 5.0*mm;	//hexagon depth
+		G4double hexPre_rin = 5.0*mm;	//hexagon inner radius (radius of the circumcircle of the hexagon)
+		G4double hexPre_thickness = 0.1*mm;	//hexagon thickness
+		G4double hexPre_rout = hexPre_rin+hexPre_thickness;	//hexagon outer radius
 		G4double hexPre_zplanes[] = {0.0*mm,hexPre_depth};
 		G4double hexPre_rinner[] = {hexPre_rin,hexPre_rin};
 		G4double hexPre_router[] = {hexPre_rout,hexPre_rout};
-		auto solidHex = new G4Polyhedra("hexPre",.0,CLHEP::twopi,6,2,
+		auto solidHexPre = new G4Polyhedra("hexPre",.0,CLHEP::twopi,6,2,
 										hexPre_zplanes,hexPre_rinner,hexPre_router);
-		auto logHex = new G4LogicalVolume(solidHex,hexPre_mat,"hexPre");
+		auto logHexPre = new G4LogicalVolume(solidHexPre,hexPre_mat,"hexPre");
 
 
         //hexagon definition CPV
-        auto hexCPV_mat = man->FindOrBuildMaterial("G4_AIR");
+        auto hexCPV_mat = man->FindOrBuildMaterial("G4_Cu");
 		G4double hexCPV_depth = 5.0*mm;
 		G4double hexCPV_rin = 5.0*mm;
 		G4double hexCPV_thickness = 0.1*mm;
@@ -61,34 +61,34 @@ namespace Hex{
 		G4double hexCPV_zplanes[] = {0.0*mm,hexCPV_depth};
 		G4double hexCPV_rinner[] = {hexCPV_rin,hexCPV_rin};
 		G4double hexCPV_router[] = {hexCPV_rout,hexCPV_rout};
-		auto solidHex = new G4Polyhedra("hexCPV",.0,CLHEP::twopi,6,2,
+		auto solidHexCPV = new G4Polyhedra("hexCPV",.0,CLHEP::twopi,6,2,
 										hexCPV_zplanes,hexCPV_rinner,hexCPV_router);
-		auto logHex = new G4LogicalVolume(solidHex,hexCPV_mat,"hexCPV");
+		auto logHexCPV = new G4LogicalVolume(solidHexCPV,hexCPV_mat,"hexCPV");
 
 
 		//hexagon assembly - pre shower plane
-		auto assemblyHex = new G4AssemblyVolume();
+		auto assemblyHexPre = new G4AssemblyVolume();	//create new assembly
 		G4ThreeVector t_hex;
 		G4RotationMatrix r_hex;
 		r_hex.rotateZ(15*deg);
 		G4Transform3D tr_hex;
 		tr_hex = G4Transform3D(r_hex,t_hex);
-		assemblyHex->AddPlacedVolume(logHex,tr_hex);
+		assemblyHexPre->AddPlacedVolume(logHexPre,tr_hex);	//add logical hex volume to assembly
 		for(int row = 0;row < hex_rows;row++){
 			G4ThreeVector t_hexarr;
 			G4double shift = 0.*mm;
-			if(row % 2 == 1)	shift = -hex_rout;// for odd row
+			if(row % 2 == 1)	shift = -hexPre_rout;// for odd row
 			// for(int col = 0;col < hex_cols+(row%2);col++){ //adds one more hex in odd rows
 			for(int col = 0;col < hex_cols;col++){
-				t_hexarr.setX(shift+col*hex_rout*2);
-				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
+				t_hexarr.setX(shift+col*hexPre_rout*2);	//horizontal displacement
+				t_hexarr.setY(row*tan(twopi/6.0)*hexPre_rout);	//vertical displacement
 				G4Transform3D tr_hexarr(r_hex,t_hexarr);
-				assemblyHex->MakeImprint(logWorld,tr_hexarr);
-				hex_count++;
-				hexarr_center += t_hexarr;
+				assemblyHexPre->MakeImprint(logWorld,tr_hexarr);	//place instance of hexagon in world
+				hex_count++;	//increment number of hexagons
+				hexarr_center += t_hexarr;	//finding hexagon assembly center
 			}
 		}
-		hexarr_center /= hex_count;
+		hexarr_center /= hex_count;	//hexagon assembly center is mean of all translation vectors
 
 		//Ar-CO2 mixture
 		auto Ar = man->FindOrBuildMaterial("G4_Ar");
@@ -99,57 +99,60 @@ namespace Hex{
 		gas_mat->AddMaterial(Ar,70*perCent);
 		gas_mat->AddMaterial(CO2,30*perCent);
 
-		//set step limits
-		G4double gasMaxStep = 0.1*hex_depth;
-		fGasStepLimit = new G4UserLimits(gasMaxStep);
-
-		//gas detectors
-		G4double gas_depth = hex_depth;
+		//gas detectors definition
+		G4double gas_depth = hexPre_depth;
 		G4double gas_rin = 0.0*mm;
-		G4double gas_thickness = hex_rin;
+		G4double gas_thickness = hexPre_rin;
 		G4double gas_zplanes[] = {0.0*mm,gas_depth};
 		G4double gas_rinner[] = {gas_rin,gas_rin};
 		G4double gas_router[] = {gas_rin+gas_thickness,gas_rin+gas_thickness};
 		auto solidGas = new G4Polyhedra("Gas",.0,CLHEP::twopi,6,2,
 										gas_zplanes,gas_rinner,gas_router);
-		auto logGas = new G4LogicalVolume(solidGas,hex_mat,"Gas");
+		auto logGas = new G4LogicalVolume(solidGas,gas_mat,"Gas");
 
+		//set maximum step size limit in gas detector (larger step size == less time taken + less accurate simulation)
+		G4double gasMaxStep = 0.1*gas_depth;
+		fGasStepLimit = new G4UserLimits(gasMaxStep);
+
+		//gas detectors placement
 		G4ThreeVector t_gas;
 		G4RotationMatrix r_gas;
 		r_gas.rotateZ(30*deg);
 		G4Transform3D tr_gas;
 		for(int row = 0,copyNo = 0;row < hex_rows;row++){
-			G4double gas_R = (hex_thickness+gas_thickness);
+			G4double gas_R = (hexPre_thickness+gas_thickness);
 			G4ThreeVector t_gasarr;
 			G4double shift = 0.*mm;
 			if(row % 2 == 1)	shift = -gas_R;
-			for(int col = 0;col < hex_cols+(row%2);col++,copyNo++){
+			// for(int col = 0;col < hex_cols+(row%2);col++,copyNo++){
+			for(int col = 0;col < hex_cols;col++,copyNo++){
 				t_gasarr.setX(shift+col*gas_R*2);
 				t_gasarr.setY(row*tan(twopi/6.0)*gas_R);
 				G4Transform3D tr_gasarr(r_gas,t_gasarr);
-				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",
-														nullptr,nullptr,nullptr));
+				fLogHex->push_back(new G4LogicalVolume(solidGas,gas_mat,"DetectorLV",	//add this gas volume to list 
+														nullptr,nullptr,nullptr));	 	//of sensitive detectors
 				fLogHex->back()->SetUserLimits(fGasStepLimit);
 				new G4PVPlacement(tr_gasarr,fLogHex->back(),"DetectorPV",logWorld,
 									false,(G4int)fLogHex->size()-1,fCheckOverlaps);
 			}
 		}
 
-		//lead converter
+		//lead converter definition
 		auto conv_mat = man->FindOrBuildMaterial("G4_Pb");
 		G4double conv_depth = 3*(0.5*cm);	//3*X0
-		G4double air_gap = 3*mm;
-		auto solidConv = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,conv_depth/2.);
+		G4double air_gap = 3*mm;	//FR4 plates will fit in this gap
+		auto solidConv = new G4Box("Converter",1.5*hexPre_rout*hex_cols,1.5*hexPre_rout*hex_rows,conv_depth/2.);
 		auto logConv = new G4LogicalVolume(solidConv,conv_mat,"Converter");
 
-		//set step limits
+		//set maximum step size limit in lead converter
 		G4double convMaxStep = 0.2*conv_depth;
 		fConvStepLimit = new G4UserLimits(convMaxStep);
 		logConv->SetUserLimits(fConvStepLimit);
 
+		//place lead converter
 		G4ThreeVector t_conv;
 		t_conv.setZ(-conv_depth/2.-air_gap);
-		// t_conv += hexarr_center;
+		t_conv+=hexarr_center;
 		auto physConv = new G4PVPlacement(nullptr,t_conv,logConv,"Converter",
 											logWorld,false,0,fCheckOverlaps);
 		
@@ -165,26 +168,30 @@ namespace Hex{
 		// 									logWorld,false,0,fCheckOverlaps);
 
 		//hexagon assembly - charged particle veto
+		auto assemblyHexCPV = new G4AssemblyVolume();	//create new assembly
+		assemblyHexCPV->AddPlacedVolume(logHexCPV,tr_hex);	//add logical hex volume to assembly
 		for(int row = 0;row < hex_rows;row++){
 			G4ThreeVector t_hexarr;
 			G4double shift = 0.*mm;
-			if(row % 2 == 1)	shift = -hex_rout;
-			for(int col = 0;col < hex_cols+(row%2);col++){
-				t_hexarr.setX(shift+col*hex_rout*2);
-				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
-				t_hexarr.setZ(-conv_depth-air_gap-hex_depth);
+			if(row % 2 == 1)	shift = -hexCPV_rout;
+			// for(int col = 0;col < hex_cols+(row%2);col++){
+			for(int col = 0;col < hex_cols;col++){
+				t_hexarr.setX(shift+col*hexCPV_rout*2);
+				t_hexarr.setY(row*tan(twopi/6.0)*hexCPV_rout);
+				t_hexarr.setZ(-conv_depth-air_gap-hexCPV_depth);
 				G4Transform3D tr_hexarr(r_hex,t_hexarr);
-				assemblyHex->MakeImprint(logWorld,tr_hexarr); 
+				assemblyHexCPV->MakeImprint(logWorld,tr_hexarr); 
 			}
 		}
 
 		//gas detectors - charged particle veto
 		for(int row = 0,copyNo = 0;row < hex_rows;row++){
-			G4double gas_R = (hex_thickness+gas_thickness);
+			G4double gas_R = (hexCPV_thickness+gas_thickness);
 			G4ThreeVector t_gasarr;
 			G4double shift = 0.*mm;
 			if(row % 2 == 1)	shift = -gas_R;
-			for(int col = 0;col < hex_cols+(row%2);col++,copyNo++){
+			// for(int col = 0;col < hex_cols+(row%2);col++,copyNo++){
+			for(int col = 0;col < hex_cols;col++,copyNo++){
 				t_gasarr.setX(shift+col*gas_R*2);
 				t_gasarr.setY(row*tan(twopi/6.0)*gas_R);
 				t_gasarr.setZ(-conv_depth-air_gap-gas_depth);
@@ -197,7 +204,7 @@ namespace Hex{
 			}
 		}
 
-		//FR4 plates
+		//FR4 plates definition
 
 		G4double density,fractionmass,a,z;
 		G4int ncomponents,natoms;
@@ -226,21 +233,23 @@ namespace Hex{
 
 		auto plate_mat = FR4;
 		G4double plate_depth = 3*mm;
-		auto solidPlate = new G4Box("Converter",1.5*hex_rout*hex_cols,1.5*hex_rout*hex_rows,plate_depth/2.);
+		auto solidPlate = new G4Box("Converter",1.5*hexPre_rout*hex_cols,1.5*hexPre_rout*hex_rows,plate_depth/2.);
 		auto logPlate = new G4LogicalVolume(solidPlate,plate_mat,"Plate");
 
-		//set step limits
+		//set maximum step size limit in FR4 plates
 		G4double plateMaxStep = 0.5*plate_depth;
 		fPlateStepLimit = new G4UserLimits(plateMaxStep);
 		logPlate->SetUserLimits(fPlateStepLimit);
 
+		//front FR4 plate placement
 		G4ThreeVector t_plate;
 		t_plate.setZ(-plate_depth/2.);
 		t_plate += hexarr_center;
 		auto physPlateFront = new G4PVPlacement(nullptr,t_plate,logPlate,"Plate",
 												logWorld,false,0,fCheckOverlaps);
+		//back FR4 plate placement
 		t_plate -= hexarr_center;
-		t_plate.setZ(hex_depth+plate_depth/2.);
+		t_plate.setZ(hexPre_depth+plate_depth/2.);
 		t_plate += hexarr_center;
 		auto physPlateBack = new G4PVPlacement(nullptr,t_plate,logPlate,"Plate",
 												logWorld,false,0,fCheckOverlaps);
@@ -255,7 +264,7 @@ namespace Hex{
 	  auto aTrackerSD = new TrackerSD(trackerChamberSDname, "TrackerHitsCollection");
 	  G4SDManager::GetSDMpointer()->AddNewDetector(aTrackerSD);
 	  // Setting aTrackerSD to all logical volumes with the same name
-	  // of "Chamber_LV".
-	  SetSensitiveDetector("Scorer", aTrackerSD, true);
+	  // of "DetectorLV".
+	  SetSensitiveDetector("DetectorLV", aTrackerSD, true);
 	}
 }

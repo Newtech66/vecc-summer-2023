@@ -27,11 +27,11 @@ namespace Hex{
 			auto hit = static_cast<TrackerHit*>(HC->GetHit(i));
 			analysisManager->FillNtupleIColumn(tupleid,0,anEvent->GetEventID());
 			G4int chamberNb = hit->GetChamberNb();
-			// G4int layerNo = chamberNb/hexcnt;
-			// analysisManager->FillNtupleIColumn(tupleid,1,layerNo);
-			// analysisManager->FillNtupleIColumn(tupleid,2,chamberNb%hexcnt);
-			// analysisManager->FillNtupleDColumn(tupleid,3,hit->GetEdep()/keV);
-			analysisManager->FillNtupleIColumn(tupleid,1,name_id_map[hit->GetParticleName()]);
+			G4int layerNo = chamberNb/hexcnt;
+			analysisManager->FillNtupleIColumn(tupleid,1,layerNo);
+			analysisManager->FillNtupleIColumn(tupleid,2,chamberNb%hexcnt);
+			analysisManager->FillNtupleDColumn(tupleid,3,hit->GetEdep()/keV);
+			analysisManager->FillNtupleIColumn(tupleid,4,name_id_map[hit->GetParticleName()]);
 			analysisManager->AddNtupleRow();
 		}
 	}

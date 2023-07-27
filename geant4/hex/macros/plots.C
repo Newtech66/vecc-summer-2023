@@ -1,7 +1,6 @@
 #include "cluster.C"
 
 pair<int,int> inv_hex_map(int hex){
-    int hexcount = (hexrows/2)*(2*hexcols+1)+(hexrows%2)*hexcols;
     int q1 = hex/(2*hexcols+1);
     int r1 = hex%(2*hexcols+1);
     std::pair<int,int> rowcol;
@@ -87,7 +86,7 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
         evclust[p.first]=cluster(data);
         t4->Fill(evclust[p.first]);
     }
-    t4->Draw();
+    t3->Draw();
     //f->Close();
     //delete f;
     //return make_tuple(0,0,0);
@@ -95,7 +94,8 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
 }
 
 void plots(){
-    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    // vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    vector<Double_t> energies{5000};
     vector<Double_t> ncells;
     vector<Double_t> sum_edep,max_edep_frac;
     for(auto energy:energies){
@@ -196,7 +196,7 @@ TH1D* get_spectrum(string pref,int energy){
     map<Int_t,Double_t> evsum;
     for(int iHit = 0;hits->LoadTree(iHit) >= 0; iHit++){
         hits->GetEntry(iHit);
-        if(layer == 1)  continue;
+        if(layer == 1 || cell!=95)  continue;
         evsum[event] += edep;
     }
 
