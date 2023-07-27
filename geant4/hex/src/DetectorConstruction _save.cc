@@ -38,33 +38,18 @@ namespace Hex{
 		auto logWorld = new G4LogicalVolume(solidWorld,world_mat,"World");
 		auto physWorld = new G4PVPlacement(nullptr,G4ThreeVector(),logWorld,"World",
 											nullptr,false,0,fCheckOverlaps);
-		//hexagon definition Preshower
-		auto hexPre_mat = man->FindOrBuildMaterial("G4_AIR");
-		G4double hexPre_depth = 5.0*mm;
-		G4double hexPre_rin = 5.0*mm;
-		G4double hexPre_thickness = 0.1*mm;
-		G4double hexPre_rout = hexPre_rin+hexPre_thickness;
-		G4double hexPre_zplanes[] = {0.0*mm,hexPre_depth};
-		G4double hexPre_rinner[] = {hexPre_rin,hexPre_rin};
-		G4double hexPre_router[] = {hexPre_rout,hexPre_rout};
-		auto solidHex = new G4Polyhedra("hexPre",.0,CLHEP::twopi,6,2,
-										hexPre_zplanes,hexPre_rinner,hexPre_router);
-		auto logHex = new G4LogicalVolume(solidHex,hexPre_mat,"hexPre");
-
-
-        //hexagon definition CPV
-        auto hexCPV_mat = man->FindOrBuildMaterial("G4_AIR");
-		G4double hexCPV_depth = 5.0*mm;
-		G4double hexCPV_rin = 5.0*mm;
-		G4double hexCPV_thickness = 0.1*mm;
-		G4double hexCPV_rout = hexCPV_rin+hexCPV_thickness;
-		G4double hexCPV_zplanes[] = {0.0*mm,hexCPV_depth};
-		G4double hexCPV_rinner[] = {hexCPV_rin,hexCPV_rin};
-		G4double hexCPV_router[] = {hexCPV_rout,hexCPV_rout};
-		auto solidHex = new G4Polyhedra("hexCPV",.0,CLHEP::twopi,6,2,
-										hexCPV_zplanes,hexCPV_rinner,hexCPV_router);
-		auto logHex = new G4LogicalVolume(solidHex,hexCPV_mat,"hexCPV");
-
+		//hexagon
+		auto hex_mat = man->FindOrBuildMaterial("G4_AIR");
+		G4double hex_depth = 5.0*mm;
+		G4double hex_rin = 5.0*mm;
+		G4double hex_thickness = 0.1*mm;
+		G4double hex_rout = hex_rin+hex_thickness;
+		G4double hex_zplanes[] = {0.0*mm,hex_depth};
+		G4double hex_rinner[] = {hex_rin,hex_rin};
+		G4double hex_router[] = {hex_rout,hex_rout};
+		auto solidHex = new G4Polyhedra("hex",.0,CLHEP::twopi,6,2,
+										hex_zplanes,hex_rinner,hex_router);
+		auto logHex = new G4LogicalVolume(solidHex,hex_mat,"hex");
 
 		//hexagon assembly - pre shower plane
 		auto assemblyHex = new G4AssemblyVolume();
@@ -77,9 +62,8 @@ namespace Hex{
 		for(int row = 0;row < hex_rows;row++){
 			G4ThreeVector t_hexarr;
 			G4double shift = 0.*mm;
-			if(row % 2 == 1)	shift = -hex_rout;// for odd row
-			// for(int col = 0;col < hex_cols+(row%2);col++){ //adds one more hex in odd rows
-			for(int col = 0;col < hex_cols;col++){
+			if(row % 2 == 1)	shift = -hex_rout;
+			for(int col = 0;col < hex_cols+(row%2);col++){
 				t_hexarr.setX(shift+col*hex_rout*2);
 				t_hexarr.setY(row*tan(twopi/6.0)*hex_rout);
 				G4Transform3D tr_hexarr(r_hex,t_hexarr);
