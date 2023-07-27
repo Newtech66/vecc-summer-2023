@@ -20,16 +20,6 @@ target_link_libraries(hex ${Geant4_LIBRARIES})
 set(HEX_SCRIPTS
 init.mac
 run.mac
-plotHisto.C
-plotCell.C
-plotPerCellEdep.C
-plots.C
-cluster.C
-clusterreal.C
-checkev.C
-checkevreal.C
-countperev.C
-backscatter.C
 )
 
 foreach(_script ${HEX_SCRIPTS})
