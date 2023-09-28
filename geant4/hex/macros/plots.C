@@ -94,14 +94,14 @@ tuple<Double_t,Double_t,Double_t> func(string pref, int energy){
 }
 
 void plots(){
-    // vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
-    vector<Double_t> energies{5000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000};
+    //vector<Double_t> energies{5000};
     vector<Double_t> ncells;
     vector<Double_t> sum_edep,max_edep_frac;
     for(auto energy:energies){
         Double_t ncell;
         Double_t sume,max_frace;
-        tie(ncell,max_frace,sume) = func("./hex_",energy);
+        tie(ncell,max_frace,sume) = func("../data_air/",energy);
         ncells.push_back(ncell);
         sum_edep.push_back(sume);
         max_edep_frac.push_back(max_frace);
@@ -110,20 +110,26 @@ void plots(){
     for(auto x:sum_edep)  cout<<x<<" ";cout<<endl;
     for(auto x:max_edep_frac)  cout<<x<<" ";cout<<endl;
 
-    string drawopts = "AL*";
+    string drawopts = "APL";
     auto c1 = new TCanvas("c1","",1920,1080);
     c1->Divide(2,2);
     c1->cd(1);
     TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),ncells.data());
     g1->SetTitle("NCells vs gamma energy;Gamma energy [MeV];NCells");
+    g1->SetMarkerStyle(29);
+    g1->SetMarkerSize(2);
     g1->Draw(drawopts.data());
     c1->cd(2);
     TGraph* g2 = new TGraph((Int_t)energies.size(),energies.data(),sum_edep.data());
     g2->SetTitle("Sum of Edep vs gamma energy;Gamma energy [MeV];Sum of Edep (MPV) [KeV]");
+    g2->SetMarkerStyle(29);
+    g2->SetMarkerSize(2);
     g2->Draw(drawopts.data());
     c1->cd(3);
     TGraph* g3 = new TGraph((Int_t)energies.size(),energies.data(),max_edep_frac.data());
     g3->SetTitle("Max Edep fraction vs gamma energy;Gamma energy [MeV];Max Edep fraction (MPV)");
+    g3->SetMarkerStyle(29);
+    g3->SetMarkerSize(2);
     g3->Draw(drawopts.data());
     c1->cd(4);
     vector<pair<Double_t,Double_t>> ncells_copy;
@@ -135,27 +141,30 @@ void plots(){
     for(auto p:ncells_copy) a_c.push_back(p.first), b_c.push_back(p.second);
     TGraph* g4 = new TGraph((Int_t)ncells.size(),a_c.data(),b_c.data());
     g4->SetTitle("Max Edep fraction vs NCells;NCells;Max Edep fraction (MPV)");
+    g4->SetMarkerStyle(29);
+    g4->SetMarkerSize(2);
     g4->Draw(drawopts.data());
 }
 
 void overlay(){
-    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000};
     vector<Double_t> ncells_1,ncells_2,ncells_3;
     vector<Double_t> sum_edep_1,sum_edep_2,sum_edep_3;
     for(auto energy:energies){
         Double_t ncell;
         Double_t sume,max_frace;
-        tie(ncell,max_frace,sume) = func("../data_air/hex_",energy);
+        tie(ncell,max_frace,sume) = func("../data_air/",energy);
         sum_edep_1.push_back(sume);
         ncells_1.push_back(ncell);
     }
     for(auto energy:energies){
         Double_t ncell;
         Double_t sume,max_frace;
-        tie(ncell,max_frace,sume) = func("../data_cu/hex_",energy);
+        tie(ncell,max_frace,sume) = func("../data_cu/",energy);
         sum_edep_2.push_back(sume);
         ncells_2.push_back(ncell);
     }
+/*
     for(auto energy:energies){
         Double_t ncell;
         Double_t sume,max_frace;
@@ -163,21 +172,26 @@ void overlay(){
         sum_edep_3.push_back(sume);
         ncells_3.push_back(ncell);
     }
+*/
     //TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),sum_edep_1.data());
     //g1->SetTitle("Sum of Edep vs gamma energy;Gamma energy [MeV];Sum of Edep (MPV) [KeV]");
     TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),ncells_1.data());
     g1->SetTitle("Ncells vs gamma energy;Gamma energy [MeV];Ncells (mean)");
     g1->SetLineColor(4);    //BLUE is air
-    g1->Draw("AL*");
+    g1->SetMarkerStyle(29);
+    g1->SetMarkerSize(2);
+    g1->Draw("APL");
     //TGraph* g2 = new TGraph((Int_t)energies.size(),energies.data(),sum_edep_2.data());
     TGraph* g2 = new TGraph((Int_t)energies.size(),energies.data(),ncells_2.data());
     // g1->SetTitle("Sum of Edep vs gamma energy;Gamma energy [MeV];Sum of Edep (MPV) [KeV]");
     g2->SetLineColor(2);    //RED is 0.4
-    g2->Draw("L*");
+    g2->SetMarkerStyle(29);
+    g2->SetMarkerSize(2);
+    g2->Draw("PL");
     TGraph* g3 = new TGraph((Int_t)energies.size(),energies.data(),ncells_3.data());
     // g1->SetTitle("Sum of Edep vs gamma energy;Gamma energy [MeV];Sum of Edep (MPV) [KeV]");
-    g3->SetLineColor(3);    //GREEN is 0.2
-    g3->Draw("L*");
+    //g3->SetLineColor(3);    //GREEN is 0.2
+    //g3->Draw("PL");
 }
 
 TH1D* get_spectrum(string pref,int energy){
@@ -208,19 +222,19 @@ TH1D* get_spectrum(string pref,int energy){
 }
 
 void show_spectra(){
-    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000};
     auto c1 = new TCanvas("c1","Air",1920,1080);
     c1->Divide(5,2);
     for(int i=0;i<energies.size();i++){
         c1->cd(i+1);
-        auto p = get_spectrum("../data_air/hex_",energies[i]);
+        auto p = get_spectrum("../data_air/",energies[i]);
         p->Draw();
     }
     auto c2 = new TCanvas("c2","Cu 0.4",1920,1080);
     c2->Divide(5,2);
     for(int i=0;i<energies.size();i++){
         c2->cd(i+1);
-        auto p = get_spectrum("../data_cu/hex_",energies[i]);
+        auto p = get_spectrum("../data_cu/",energies[i]);
         p->Draw();
     }
 }

@@ -1,17 +1,14 @@
 #include "cluster.C"
 
 pair<int,int> inv_hex_map(int hex){
-    int hexcount = (hexrows/2)*(2*hexcols+1)+(hexrows%2)*hexcols;
-    int q1 = hex/(2*hexcols+1);
-    int r1 = hex%(2*hexcols+1);
     std::pair<int,int> rowcol;
-    rowcol.first = 2*q1+(r1>=hexcols);
-    rowcol.second = 2*r1+(r1>=hexcols?-2*hexcols:1);
+    rowcol.first = hex/hexcols;
+    rowcol.second = hex%hexcols;
     return rowcol;
 }
 
 void get_data(int energy,vector<tuple<Int_t,Int_t,Double_t>> &evcells){
-    string filename = "../data_cu/hex_"+to_string(energy)+"MeV.root";
+    string filename = "../data_cu/"+to_string(energy)+"MeV.root";
     TFile* f = new TFile(filename.data());
     TTree* hits = (TTree*)f->Get("Hits");
     Int_t event,layer,cell;
@@ -64,7 +61,7 @@ Double_t split_clust_frac(int energy){
 }
 
 void show_split_clusts(){
-    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000};
     vector<Double_t> split_clusts;
     for(auto energy:energies){
         split_clusts.push_back(split_clust_frac(energy));
@@ -72,11 +69,13 @@ void show_split_clusts(){
     for(int i=0;i<energies.size();i++){
         cout<<energies[i]<<'\t'<<split_clusts[i]<<endl;
     }
-    string drawopts = "AL*";
+    string drawopts = "APL";
     auto c1 = new TCanvas("split_clusts","",1920,1080);
     c1->cd(1);
     TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),split_clusts.data());
     g1->SetTitle("Fraction of split clusters vs gamma energy;Gamma energy [MeV];Split cluster fraction");
+    g1->SetMarkerStyle(29);
+    g1->SetMarkerSize(2);
     g1->Draw(drawopts.data());
 }
 
@@ -105,7 +104,8 @@ void event_display(int energy,int cell_cut){
     cnts->Draw();
     TCanvas* c1 = new TCanvas("event_display","",640,1080);
     TH2Poly* seehits = new TH2Poly();
-    seehits->SetTitle("Event display");
+    string title = "Event display for a gamma ray of initial energy " + to_string(energy) + " MeV";
+    seehits->SetTitle(title.data());
     seehits->Honeycomb(0,0,1,hexcols+1,hexrows);
     for(auto p:evcells){
         if(get<0>(p)!=key)   continue;
@@ -113,11 +113,11 @@ void event_display(int energy,int cell_cut){
         int row,col;
         tie(row,col)=inv_hex_map(get<1>(p));
         if(row%2==0){
-            seehits->Fill(mvr*(1+col),1+1.5*row,get<2>(p));
+            seehits->Fill(2*mvr+2*mvr*col,1+1.5*(row+1),get<2>(p));
         }else{
-            seehits->Fill(mvr*(1+col),1+1.5*row,get<2>(p));
+            seehits->Fill(mvr+2*mvr*col,1+1.5*(row+1),get<2>(p));
         }
     }
-    // gStyle->SetOptStat(0);
+    gStyle->SetOptStat(0);
     seehits->Draw("colz text");
 }

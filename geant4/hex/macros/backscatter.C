@@ -38,14 +38,16 @@ Double_t backscatter_single(string pref, int energy){
 }
 
 void backscatter(string pref){
-    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000,10000};
+    vector<Double_t> energies{10,20,50,80,100,200,500,1000,5000};
     vector<Double_t> ncells;
     for(auto energy:energies){
         ncells.push_back(backscatter_single(pref,energy));
     }
     TCanvas* c1 = new TCanvas("backscatter","",1920,1080);
-    string drawopts = "AL*";
+    string drawopts = "APL";
     TGraph* g1 = new TGraph((Int_t)energies.size(),energies.data(),ncells.data());
     g1->SetTitle("NCells CPV vs gamma energy;Gamma energy [MeV];NCells CPV");
+    g1->SetMarkerStyle(29);
+    g1->SetMarkerSize(2);
     g1->Draw(drawopts.data());
 }

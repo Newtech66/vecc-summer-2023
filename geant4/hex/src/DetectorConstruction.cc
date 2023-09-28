@@ -39,7 +39,7 @@ namespace Hex{
 		auto physWorld = new G4PVPlacement(nullptr,G4ThreeVector(),logWorld,"World",
 											nullptr,false,0,fCheckOverlaps);
 		//hexagon definition Preshower
-		auto hexPre_mat = man->FindOrBuildMaterial("G4_Cu");
+		auto hexPre_mat = man->FindOrBuildMaterial("G4_AIR");
 		G4double hexPre_depth = 5.0*mm;	//hexagon depth
 		G4double hexPre_rin = 5.0*mm;	//hexagon inner radius (radius of the circumcircle of the hexagon)
 		G4double hexPre_thickness = 0.1*mm;	//hexagon thickness
